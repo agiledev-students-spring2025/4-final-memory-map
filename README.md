@@ -22,8 +22,8 @@ As a team, we have collaborated to create a wireframe to give a general idea of 
 
 ## Instructions for Building and Testing
 
-`Todo`: To work on this project, please follow the [contributing guidelines](./instructions-4-deployment.md) guidelines.<br/>
-`Todo`: Testing
+To work on this project, please follow our [contributing guidelines](./instructions-4-deployment.md).<br/>
+`Todo`: Instructions for building and testing
 
 ## Other Links, Sprints, and Due Dates
 
