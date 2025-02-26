@@ -45,7 +45,7 @@ We will communicate on Discord on a channel with course admin. If the team decid
 * Team members will use GitHub to manage the project
 * Team members will NOT use GitHub Desktop
 * Team members will use Tailwind
-* Team members will use cameCase for naming variables
+* Team members will use camelCase for naming variables
 * Don't over-engineer. Write minimum code to get things working end to end, only then iterate to improve. - Code for each task and spike must be peer-reviewed and pass tests before merging into the main branch of code.
 * Always push working code, if you break the pipeline/build then fix it.
 * Make granular and small commits, per feature or per bug fix.
@@ -69,7 +69,7 @@ We will communicate on Discord on a channel with course admin. If the team decid
 
 ## Rules of contributing
 * Anyone contributing should take into consideration this is a group project for class, so they should maintain professional correspondence
-* They should follow the our convention of using camel case variables and Tailwind for our css language
+* They should follow the our convention of using camelCase variables and Tailwind for our css language
 * If they have a new idea, they should reach out to the team for general approval and concensus
 
 ## Instructions for setting up the local development environment in order to work on this project
