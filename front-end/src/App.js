@@ -9,7 +9,8 @@ import NoPage from './pages/NoPage';
 
 function App() {
   return (
-      <div>
+    <div className="flex flex-col h-[956px] max-w-[440px] mx-auto">
+      <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/friends" element={<Friends />} />
@@ -17,8 +18,9 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NoPage />} />
         </Routes>
-        <Navbar />
       </div>
+      <Navbar />
+    </div>
   );
 }
 
