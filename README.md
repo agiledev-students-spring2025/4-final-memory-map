@@ -23,7 +23,14 @@ As a team, we have collaborated to create a wireframe to give a general idea of 
 ## Instructions for Building and Testing
 
 To work on this project, please follow our [contributing guidelines](./instructions-4-deployment.md).<br/>
-`Todo`: Instructions for building and testing
+
+Run these commands to build the frontend
+
+``` 
+cd front-end
+npm install
+npm run start
+```
 
 ## Other Links, Sprints, and Due Dates
 
