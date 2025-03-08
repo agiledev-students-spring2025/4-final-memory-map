@@ -5,7 +5,7 @@ const Profile = () => {
   return (
     <div>
       <h1>Profile</h1>
-      <div>
+      <div className="flex flex-wrap gap-4">
         <Image width={200} height={200} variant="circular" />
       </div>
     </div>
@@ -13,4 +13,5 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
