@@ -1,4 +1,6 @@
-export const ProfileIcon = () => {
+import React from "react";
+
+const ProfileIcon = () => {
     return (
         <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -12,6 +14,7 @@ export const ProfileIcon = () => {
                 clip-rule="evenodd" 
             />
         </svg>
-    )
-}
+    );
+};
 
+export default ProfileIcon;

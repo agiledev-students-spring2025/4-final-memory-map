@@ -1,4 +1,6 @@
-export const FeedIcon = () => {
+import React from "react";
+
+const FeedIcon = () => {
     return (
         <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -13,5 +15,7 @@ export const FeedIcon = () => {
             />
         </svg>
 
-    )
-}
+    );
+};
+
+export default FeedIcon;

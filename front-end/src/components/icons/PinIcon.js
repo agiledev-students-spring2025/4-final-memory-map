@@ -1,4 +1,6 @@
-export const PinIcon = () => {
+import React from "react";
+
+const PinIcon = () => {
     return (
         <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -11,5 +13,7 @@ export const PinIcon = () => {
                 clip-rule="evenodd" 
             />
         </svg>
-    )
-}
+    );
+};
+
+export default PinIcon;
