@@ -1,16 +1,16 @@
-import React, { useEffect} from "react";
+import React, {useState} from "react";
 import PinIcon from "./icons/PinIcon";
 import XIcon from "./icons/XIcon";
-import OpenEyeIcon from "./icons/OpenEyeIcon";
+import Button from "./Button";
+import ViewEye from "./ViewEye";
 
 const LocationItem = (props) => {
-    // const [open, setOpen] = useState(null);
-    let showLocationDetails = false;
     const locationName = props.location.pin_location_city;
+    const [viewLocationDetails, setViewLocationDetails] = useState('');
 
-    useEffect(() => {
-        showLocationDetails = true;
-    })
+    const handleClick = () => {
+        viewLocationDetails ? setViewLocationDetails(false):setViewLocationDetails(true);
+    };
 
     return (
         <div className="flex justify-between w-full p-3.5">
@@ -22,7 +22,10 @@ const LocationItem = (props) => {
             </div>
             <div>
                 <div className="flex flex-row gap-3">
-                    <OpenEyeIcon />
+
+                    <Button onClick={handleClick}>
+                        <ViewEye status={viewLocationDetails}/>
+                    </Button>
                     <XIcon />
                 </div>
             </div>
