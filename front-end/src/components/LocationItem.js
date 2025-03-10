@@ -13,17 +13,17 @@ const LocationItem = (props) => {
     })
 
     return (
-        <div className="flex flex-row justify-between w-full p-">
+        <div className="flex justify-between w-full p-3.5">
             <div>
-                <div className="flex flex-row">
-                    <PinIcon/>
-                    <p className="px-3.5">{locationName}</p>
+                <div className="flex gap-3">
+                    <PinIcon />
+                    <span className="text-lg">{locationName}</span>
                 </div>
             </div>
             <div>
-                <div className="flex flex-row gap-2">
-                    <OpenEyeIcon/>
-                    <XIcon/>
+                <div className="flex flex-row gap-3">
+                    <OpenEyeIcon />
+                    <XIcon />
                 </div>
             </div>
         </div>
