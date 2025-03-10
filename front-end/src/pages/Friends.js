@@ -27,11 +27,11 @@ const Friends = () => {
     );
 
     return (
-        <div className="mx-auto p-3">
+        <div className="flex flex-col mx-auto p-3 h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <div className="text-xl font-bold p-3.5 pb-0"> Social Circle </div>
             <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {filteredFriends.length} friends </div>
-            <div className="max-h-[600px] overflow-y-auto">
+            <div className="flex-1 overflow-y-auto">
                 {filteredFriends.map(friend => (
                     <FriendItem key={friend.user_id} friend={friend} />
                 ))}
