@@ -3,9 +3,10 @@ import PinIcon from "./icons/PinIcon";
 import XIcon from "./icons/XIcon";
 import Button from "./Button";
 import ViewEye from "./ViewEye";
+import ExpandedLocationItem from "./ExpandedLocationItem";
 
 const LocationItem = (props) => {
-    const locationName = props.location.pin_location_city;
+    const locationName = props.location.pin_name;
     const [viewLocationDetails, setViewLocationDetails] = useState('');
 
     const handleClick = () => {
@@ -13,23 +14,26 @@ const LocationItem = (props) => {
     };
 
     return (
-        <div className="flex justify-between w-full p-3.5">
-            <div>
-                <div className="flex gap-3">
-                    <PinIcon />
-                    <span className="text-lg">{locationName}</span>
+        <>
+            <div className="flex justify-between w-full py-3.5">
+                <div>
+                    <div className="flex gap-3">
+                        <PinIcon />
+                        <span className="text-lg">{locationName}</span>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <div className="flex flex-row gap-3">
+                <div>
+                    <div className="flex flex-row gap-3">
 
-                    <Button onClick={handleClick}>
-                        <ViewEye status={viewLocationDetails}/>
-                    </Button>
-                    <XIcon />
+                        <Button onClick={handleClick}>
+                            <ViewEye status={viewLocationDetails}/>
+                        </Button>
+                        <XIcon />
+                    </div>
                 </div>
             </div>
-        </div>
+            <ExpandedLocationItem viewDetails={viewLocationDetails} location={props.location}/>
+        </>
     )
 }
 
