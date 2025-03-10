@@ -1,25 +1,31 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import LocationItem from '../components/LocationItem';
 
 const Feeds = () => {
-    const [pinned_location, set_pinned_location] = useState(null);
+    const [pinnedLocations, setPinnedLocations] = useState(null);
 
     useEffect(() => {
         fetch('https://my.api.mockaroo.com/location.json', {
             headers: {
-                'X-API-Key': ProcessingInstruction.env.REACT_APP_MOCKAROO_KEY
+            'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
             }
         })
         .then(response => response.json())
-        .then(data => set_pinned_location(data))
+        .then(data => setPinnedLocations(data))
         .catch(error => console.error('Error fetching pinned location:', error));
     }, []);
 
-    if (friends === null) {
+    if (pinnedLocations === null) {
         return <div>Loading...</div> //TODO: loading replace
     }
     return (
-        <div className="flex flex-col mx-auto p-3 h-full">
-            <div className="text-xl font-bold p-3.5 pb-0">Feed</div>
+        <div className="flex flex-col mx-auto p-3 h-full items-center">
+            <div className="text-xl font-bold p-3.5">Feed</div>
+            <div className="flex-1 overflow-y-auto">
+                {pinnedLocations.map(location => (
+                    <LocationItem key={location.pin_id} location={location}/>
+                ))}
+            </div>
         </div>
     );
 };
