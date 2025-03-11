@@ -1,4 +1,11 @@
+import { Link } from 'react-router-dom';
+import Button from "../components/Button";
+
 const Login = () => {
+    const handleLogin = () => {
+        console.log("Login button clicked"); 
+      };
+
     return (
         <div className="h-screen flex justify-center bg-white">
             <div className="w-full max-w-md p-5">
@@ -23,6 +30,13 @@ const Login = () => {
                             placeholder="Enter password"
                         />
                     </div>
+                    
+                    <p className="mt-4 text-left text-sm pb-4">
+                        Don't have an account?{" "}
+                        <Link to="/register" className="text-gray-500 hover:underline">Register</Link>
+                    </p>
+
+                    <Button onClick={handleLogin}>Login</Button>
                 </form>
             </div>
         </div>
