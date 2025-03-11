@@ -14,7 +14,7 @@ const Image = ({ width = 400, height = 400,variant = "default"}) => {
       <img
         className={imageClass}
         src={ImgUrl}
-        alt="Random image"
+        alt="Random"
         width={width}
         height={height}
       />
