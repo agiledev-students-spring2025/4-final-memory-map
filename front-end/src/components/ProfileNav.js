@@ -1,29 +1,34 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import EditProfile from '../components/EditProfile';
+import Settings from '../components/Settings';
+import Logout from '../components/Logout';
 
-const ProfileNav = ()=>{
+const ProfileNav = ({ setCurrComponent, user, setUser }) => {
     return (
-        <div className="w-5/6 mx-auto bg-white mt-20 rounded-lg">
-            <Link
-            to="#"
-            className="flex items-center justify-between p-4 border-b text-gray-800 hover:bg-gray-100 transition"
+        <div className="max-w-md mx-auto bg-white mt-20 rounded-lg">
+            {/* Edit Profile */}
+            <button
+                onClick={() => setCurrComponent(<EditProfile setCurrComponent={setCurrComponent} user={user} setUser={setUser} />)}
+                className="p-4 border-b w-full text-gray-800 hover:bg-gray-100 transition text-left"
             >
                 <span>Edit</span>
-            </Link>
+            </button>
 
-            <Link
-            to="#"
-            className="flex items-center justify-between p-4 border-b text-gray-800 hover:bg-gray-100 transition"
+            {/* Settings */}
+            <button
+                onClick={() => setCurrComponent(<Settings setCurrComponent={setCurrComponent} />)}
+                className="p-4 border-b w-full text-gray-800 hover:bg-gray-100 transition text-left"
             >
                 <span>Settings</span>
-            </Link>
+            </button>
 
-            <Link
-            to="#"
-            className="flex items-center justify-between p-4 border-b text-gray-800 hover:bg-gray-100 transition"
+            {/* Logout */}
+            <button
+                onClick={() => setCurrComponent(<Logout setCurrComponent={setCurrComponent} setUser={setUser}/>)}
+                className="p-4 border-b w-full text-gray-800 hover:bg-gray-100 transition text-left"
             >
                 <span>Logout</span>
-            </Link>
+            </button>
         </div>
     );
 };
