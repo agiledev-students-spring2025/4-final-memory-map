@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+//import React, {useEffect, useState} from 'react';
 import LocationItem from '../components/LocationItem';
 import data from '../tempLocationData.json';
 
