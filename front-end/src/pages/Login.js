@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import Button from "../components/Button";
 import { useState } from 'react';
+import Button from "../components/Button";
+import Image from "../components/MockImage";
 
 const Login = () => {
     const [username, setUsername] = useState("");
@@ -21,6 +22,10 @@ const Login = () => {
     return (
         <div className="h-screen flex justify-center bg-white">
             <div className="w-full max-w-md p-5">
+                <div className="flex justify-center mb-4">
+                    <Image width={300} height={300}/>
+                </div>
+                
                 <h2 className="text-left text-2xl font-bold text-black-500">Login</h2>
                 <form className="mt-2" onSubmit={handleLogin}>
                     <div className="mb-4">
