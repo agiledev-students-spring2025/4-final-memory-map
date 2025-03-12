@@ -12,6 +12,9 @@ const Navbar = () => {
                     <NavbarTab to="/friends" label="Friends" />
                 </li>
                 <li>
+                    <NavbarTab to="/new-location" label="New Location" />
+                </li>
+                <li>
                     <NavbarTab to="/feeds" label="Feed" />
                 </li>
                 <li>
