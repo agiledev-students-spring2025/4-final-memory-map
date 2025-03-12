@@ -6,7 +6,7 @@ const Logout = ({ setCurrComponent, setUser }) => {
     const navigate = useNavigate();
     const handleLogout = () => {
         setUser({ first_name: "First", last_name: "Last", username: "unknown" });
-        navigate("../login");
+        navigate("/login");
     }
 
     return (
