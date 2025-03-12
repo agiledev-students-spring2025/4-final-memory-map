@@ -1,21 +1,34 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from "../components/Button";
+import { useState } from 'react';
 
 const Login = () => {
-    const handleLogin = () => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+
+    const handleLogin = (event) => {
+        event.preventDefault();
+
+        if (!username || !password) {
+            alert("Please enter an username and password.");
+            return;
+        }
         console.log("Login button clicked"); 
+        navigate("/");
       };
 
     return (
         <div className="h-screen flex justify-center bg-white">
             <div className="w-full max-w-md p-5">
                 <h2 className="text-left text-2xl font-bold text-black-500">Login</h2>
-                <form className="mt-2">
+                <form className="mt-2" onSubmit={handleLogin}>
                     <div className="mb-4">
                         <label className="block text-gray-700">Username</label>
                         <input
                             type="text"
-                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                             placeholder="Enter username"
                         />
@@ -25,7 +38,8 @@ const Login = () => {
                         <label className="block text-gray-700">Password</label>
                         <input
                             type="password"
-                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                             placeholder="Enter password"
                         />
