@@ -13,7 +13,31 @@ L.Icon.Default.mergeOptions({
 
 const MapPin = ({ pinData }) => (
     <Marker position={[pinData.pin_location_latitude, pinData.pin_location_longitude]}>
-        <Popup>{pinData.pin_location_city} {pinData.pin_location_country}</Popup>
+        <Popup>
+            <div className="w-full max-w-full">
+                <div className="bg-white p-4 rounded">
+                    <h2 className="text-xl font-bold mb-2">{pinData.pin_name}</h2>
+                    <img
+                        src={pinData.image_url}
+                        alt={pinData.pin_name}
+                        className="w-1/4 h-1/4 mb-2 rounded"
+                    />
+                    <button 
+                        className="text-blue-500 underline text-xs mb-2"
+                        onClick={() => window.open(pinData.image_url, '_blank')}
+                    >
+                        View Original Size Image
+                    </button>
+                    <div className="text-sm text-gray-600 mb-2">
+                        {pinData.pin_location_city}, {pinData.pin_location_country}
+                    </div>
+                    <div className="text-xs text-gray-500 mb-2">
+                        Created at: {pinData.pin_created_at}
+                    </div>
+                    <p className="text-gray-700">{pinData.pin_description}</p>
+                </div>
+            </div>
+        </Popup>
     </Marker>
 );
 export default MapPin;

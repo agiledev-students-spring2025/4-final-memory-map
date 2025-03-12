@@ -1,6 +1,7 @@
 import React from 'react';
 import {Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Register from './pages/Register';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
 import Friends from './pages/Friends';
@@ -11,7 +12,7 @@ import NewLocation from './pages/NewLocation';
 
 function App() {
   const location = useLocation();
-  const noNavBar = ["/login"];
+  const noNavBar = ["/login", "/register"];
   const showNavBar = !noNavBar.includes(location.pathname);
 
   return (
@@ -19,6 +20,7 @@ function App() {
       <div className="flex flex-col h-[90vh] w-[40vh]">
         <div className="flex-grow overflow-hidden">
           <Routes>
+            <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Landing />} />
             <Route path="/friends" element={<Friends />} />

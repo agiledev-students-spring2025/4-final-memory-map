@@ -47,7 +47,7 @@ const Friends = () => {
     );
 
     return (
-        <div className="flex flex-col mx-auto p-3 h-full">
+        <div className="flex flex-col mx-auto h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <div className="text-xl font-bold p-3.5 pb-0"> Social Circle </div>
             <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {filteredFriends.length} friends </div>
