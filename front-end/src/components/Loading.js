@@ -38,3 +38,4 @@ const DotsAnimation = () => {
 };
 
 export default DotsAnimation;
+

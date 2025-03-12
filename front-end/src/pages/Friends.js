@@ -5,6 +5,7 @@ import FriendSearchBar from '../components/FriendSearchBar';
 const Friends = () => {
     const [friends, setFriends] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
         fetch('https://my.api.mockaroo.com/friends_page_test.json', {
@@ -13,21 +14,40 @@ const Friends = () => {
             }
         })
         .then(response => response.json())
-        .then(data => setFriends(data))
+        .then(data => {
+            if (Array.isArray(data)) {
+                setFriends(data);
+            } else {
+                setHasError(true);
+            }
+        })
         .catch(error => console.error('Error fetching friends:', error));
     }, []);
 
-    if (friends === null) {
-        return <div>Loading...</div>; //NOTE: replace with loading component
+    //maybe make a custom hook for this in the future
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (friends === null) {
+            setHasError(true);
+            }
+        }, 10000);
+        return () => clearTimeout(timer);
+    }, [friends]);
+
+    if (hasError) {
+        return <div>Something went wrong with the backend server</div>;
     }
 
-    //NOTE: Maybe do this in the backend and add a loading component in the future
+    if (friends === null) {
+        return <div>Loading ...</div>;
+    }
+
     const filteredFriends = friends.filter(friend =>
-        `${friend.first_name} ${friend.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
+      `${friend.first_name} ${friend.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <div className="flex flex-col mx-auto p-3 h-full">
+        <div className="flex flex-col mx-auto h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <div className="text-xl font-bold p-3.5 pb-0"> Social Circle </div>
             <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {filteredFriends.length} friends </div>
