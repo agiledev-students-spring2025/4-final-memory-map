@@ -6,6 +6,7 @@ import Friends from './pages/Friends';
 import Feeds from './pages/Feeds';
 import Profile from './pages/Profile';
 import NoPage from './pages/NoPage';
+import NewLocation from './pages/NewLocation';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/friends" element={<Friends />} />
             <Route path="/feeds" element={<Feeds />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/new-location" element={<NewLocation />} />
             <Route path="*" element={<NoPage />} />
           </Routes>
         </div>
