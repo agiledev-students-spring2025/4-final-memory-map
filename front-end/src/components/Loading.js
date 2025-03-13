@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const DotsAnimation = () => {
+const Loading = () => {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
@@ -37,5 +37,5 @@ const DotsAnimation = () => {
   );
 };
 
-export default DotsAnimation;
+export default Loading;
 
