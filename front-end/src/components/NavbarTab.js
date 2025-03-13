@@ -8,7 +8,7 @@ import PlusIcon from './icons/PlusIcon';
 
 
 const NavbarTab = ({ to, label }) => {
-    if (label == "Landing") {
+    if (label === "Landing") {
         return (
             <Link to={to} className="bg-gray-400 text-white hover:bg-gray-700 flex items-center justify-center h-14 w-14">
                 <PinIcon>
@@ -16,7 +16,7 @@ const NavbarTab = ({ to, label }) => {
                 </PinIcon>
             </Link>
         );
-    } else if (label == "Friends") {
+    } else if (label === "Friends") {
         return (
             <Link to={to} className="bg-gray-400 text-white hover:bg-gray-700 flex items-center justify-center h-14 w-14">
                 <FriendsIcon>
