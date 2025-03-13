@@ -1,26 +1,41 @@
 import React, { useState, useEffect } from "react";
-import styles from "./DotsAnimation.module.scss";
 
-const DotsAnimation = () => {
+const Loading = () => {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setAnimate(true), 500);
+    const timer = setTimeout(() => setAnimate(true), 500);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>
-        Loading
-        <span className={`${styles.dots} ${animate ? styles["dots--animate"] : ""}`}>
-          <span className={`${styles.dot} ${styles.z}`} />
-          <span className={`${styles.dot} ${styles.f}`} />
-          <span className={`${styles.dot} ${styles.s}`} />
-          <span className={`${styles.dot} ${styles.l}`} />
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <h1 className="text-2xl font-bold flex items-center space-x-1">
+        <span>Loading</span>
+        <span className="flex">
+          <span
+            className={`w-2 h-2 mx-0.5 bg-gray-600 rounded-full transition-opacity ${
+              animate ? "animate-bounce" : "opacity-0"
+            }`}
+            style={{ animationDelay: "0s" }}
+          ></span>
+          <span
+            className={`w-2 h-2 mx-0.5 bg-gray-600 rounded-full transition-opacity ${
+              animate ? "animate-bounce" : "opacity-0"
+            }`}
+            style={{ animationDelay: "0.2s" }}
+          ></span>
+          <span
+            className={`w-2 h-2 mx-0.5 bg-gray-600 rounded-full transition-opacity ${
+              animate ? "animate-bounce" : "opacity-0"
+            }`}
+            style={{ animationDelay: "0.4s" }}
+          ></span>
         </span>
       </h1>
     </div>
   );
 };
 
-export default DotsAnimation;
+export default Loading;
+
