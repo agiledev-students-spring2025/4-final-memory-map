@@ -24,6 +24,8 @@ As a team, we have collaborated to create a wireframe to give a general idea of 
 
 To work on this project, please follow our [contributing guidelines](./instructions-4-deployment.md).<br/>
 
+Make a copy of the .envCOPY file and name it .env then copy the .env data from discord
+
 Run these commands to build the frontend
 
 ``` 
