@@ -25,7 +25,7 @@ const NewLocation = () => {
             return;
         }
         try {
-            const response = await fetch('https://my.api.mockaroo.com/location_schema.json?key=e924a6e0&__method=POST', {
+            const response = await fetch(`https://my.api.mockaroo.com/location_schema.json?key=${process.env.REACT_APP_MOCKAROO_KEY_TWO}&__method=POST`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
