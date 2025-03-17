@@ -6,7 +6,7 @@ const Navbar = () => {
         <nav>
             <ul className="flex justify-between">
                 <li>
-                    <NavbarTab to="/" label="Landing" />
+                    <NavbarTab to="/landing" label="Landing" />
                 </li>
                 <li>
                     <NavbarTab to="/friends" label="Friends" />

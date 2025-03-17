@@ -16,7 +16,7 @@ const Login = () => {
             return;
         }
         console.log("Login button clicked"); 
-        navigate("/");
+        navigate("/landing");
       };
 
     return (
