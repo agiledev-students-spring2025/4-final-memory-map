@@ -16,7 +16,7 @@ const ProfileNav = ({ setCurrComponent, user, setUser }) => {
 
             {/* Settings */}
             <button
-                onClick={() => setCurrComponent(<Settings setCurrComponent={setCurrComponent} />)}
+                onClick={() => setCurrComponent(<Settings setCurrComponent={setCurrComponent} user={user}  setUser={setUser}/>)}
                 className="p-4 border-b w-full text-gray-800 hover:bg-gray-100 transition text-left"
             >
                 <span>Settings</span>
