@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import LocationItem from '../components/LocationItem';
+import Loading from '../components/Loading';
 
 const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
@@ -19,7 +20,7 @@ const Feeds = () => {
     };
 
     if (pinnedLocations === null) {
-        return <div>Loading...</div>; // TODO: replace with loading component
+        return <Loading></Loading>;
     }
 
     return (

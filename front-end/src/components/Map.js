@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import MapPin from './MapPin';
+import Loading from './Loading';
 
 const Map = () => {
     
@@ -21,7 +22,7 @@ const Map = () => {
     }, []);
 
     if (pinnedLocations.length === 0) {
-        return <div>Loading map...</div>;
+        return <Loading></Loading>;
     }
     
     const centerCoordinates = [pinnedLocations[0].pin_location_latitude, pinnedLocations[0].pin_location_longitude];

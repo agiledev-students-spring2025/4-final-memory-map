@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FriendItem from '../components/FriendItem';
 import FriendSearchBar from '../components/FriendSearchBar';
+import Loading from '../components/Loading';
 
 const Friends = () => {
     const [friends, setFriends] = useState(null);
@@ -42,7 +43,7 @@ const Friends = () => {
     }
 
     if (friends === null) {
-        return <div>Loading ...</div>;
+        return <Loading></Loading>;
     }
 
     const filteredFriends = friends.filter(friend =>
