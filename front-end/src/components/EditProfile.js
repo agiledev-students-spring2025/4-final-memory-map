@@ -6,6 +6,10 @@ const EditProfile = ({ setCurrComponent, user, setUser }) => {
     const [lastName, setLastName] = useState(user?.last_name || "");
 
     const handleSave = () => {
+        if (!setUser) {
+            console.error("Cannot update user.");
+            return;
+        }
 
         setUser(prevUser => ({
             ...prevUser,
@@ -13,12 +17,14 @@ const EditProfile = ({ setCurrComponent, user, setUser }) => {
             last_name: lastName
         }));
 
-      
-        setCurrComponent(<ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={{ first_name: firstName, last_name: lastName }} />);
+        
+        setCurrComponent(
+            <ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={{ first_name: firstName, last_name: lastName }} />
+        );
     };
 
     return (
-        <div className="w-5/6 mx-auto bg-white mt-20 p-6">
+        <div className="w-5/6 mx-auto bg-white p-6">
             <h2 className="text-xl font-bold text-center mb-4">Edit Profile</h2>
             <div className="space-y-4">
                 <input 
@@ -27,6 +33,7 @@ const EditProfile = ({ setCurrComponent, user, setUser }) => {
                     value={firstName} 
                     onChange={(e) => setFirstName(e.target.value)}
                     className="w-full p-2 border rounded"
+                    required
                 />
                 <input 
                     type="text" 
@@ -34,12 +41,16 @@ const EditProfile = ({ setCurrComponent, user, setUser }) => {
                     value={lastName} 
                     onChange={(e) => setLastName(e.target.value)}
                     className="w-full p-2 border rounded"
+                    required
                 />
             </div>
             <div className="flex justify-center mt-4">
-                <button 
+            <button 
                     onClick={handleSave}
-                    className="px-4 py-2 bg-gray-500 text-white hover:bg-green-600 transition"
+                    className={`px-4 py-2 text-white transition ${
+                        firstName && lastName ? "bg-gray-500 hover:bg-green-600" : "bg-gray-300 cursor-not-allowed"
+                    }`}
+                    disabled={!firstName || !lastName} 
                 >
                     Save and Back
                 </button>
