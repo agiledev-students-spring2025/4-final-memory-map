@@ -1,19 +1,15 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import PinIcon from "./icons/PinIcon";
 import XIcon from "./icons/XIcon";
 import ViewEye from "./ViewEye";
 import ExpandedLocationItem from "./ExpandedLocationItem";
 
-const LocationItem = (props) => {
-    const locationName = props.location.pin_name;
-    const [viewLocationDetails, setViewLocationDetails] = useState('');
+const LocationItem = ({ location, removeLocation }) => {
+    const locationName = location.pin_name;
+    const [viewLocationDetails, setViewLocationDetails] = useState(false);
 
     const handleClick = () => {
-        viewLocationDetails ? setViewLocationDetails(false):setViewLocationDetails(true);
-    };
-
-    const handleRemove = () => {
-        alert('Removing location');
+        setViewLocationDetails(!viewLocationDetails);
     };
 
     return (
@@ -27,19 +23,18 @@ const LocationItem = (props) => {
                 </div>
                 <div>
                     <div className="flex flex-row gap-3">
-
                         <button onClick={handleClick}>
-                            <ViewEye status={viewLocationDetails}/>
+                            <ViewEye status={viewLocationDetails} />
                         </button>
-                        <button onClick={handleRemove}>
-                            <XIcon  />
+                        <button onClick={() => removeLocation(location.pin_id)}>
+                            <XIcon />
                         </button>
                     </div>
                 </div>
             </div>
-            <ExpandedLocationItem viewDetails={viewLocationDetails} location={props.location}/>
+            <ExpandedLocationItem viewDetails={viewLocationDetails} location={location} />
         </>
-    )
-}
+    );
+};
 
 export default LocationItem;
