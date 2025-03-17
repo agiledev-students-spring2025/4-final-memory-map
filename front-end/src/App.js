@@ -1,6 +1,7 @@
 import React from 'react';
 import {Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Header from './components/Header';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
@@ -18,6 +19,9 @@ function App() {
   return (
     <div className="h-screen flex items-center justify-center">
       <div className="flex flex-col h-[90vh] w-[40vh]">
+        <div className="flex-shrink-0">
+          <Header />
+        </div> 
         <div className="flex-grow overflow-hidden">
           <Routes>
             <Route path="/register" element={<Register />} />
