@@ -31,7 +31,7 @@ const Register = () => {
         }
 
         console.log("Register button clicked"); 
-        navigate("/");
+        navigate("/landing");
       };
     
     return (

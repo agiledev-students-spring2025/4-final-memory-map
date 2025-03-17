@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, Routes, useLocation } from 'react-router-dom';
+import {Route, Routes, useLocation, Navigate} from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Header from './components/Header';
 import Register from './pages/Register';
@@ -26,7 +26,8 @@ function App() {
           <Routes>
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Landing />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/feeds" element={<Feeds />} />
             <Route path="/profile" element={<Profile />} />

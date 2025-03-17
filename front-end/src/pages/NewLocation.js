@@ -35,7 +35,7 @@ const NewLocation = () => {
     
             if (response.ok) {
                 console.log('New location created');
-                navigate("/");
+                navigate("/landing");
             } else {
                 console.error('Error occured:', response.status);
             }
