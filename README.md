@@ -32,6 +32,22 @@ npm install
 npm run start
 ```
 
+Run these commands to build the backend
+
+````
+cd back-end
+npm install
+npm start watch
+````
+
+Run these commands to test the backend
+
+````
+cd back-end
+npm install
+npm test
+````
+
 ## Other Links, Sprints, and Due Dates
 
 Several sets of instructions are included in this repository. They should each be treated as separate assignments with their own due dates and sets of requirements.
