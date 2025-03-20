@@ -1,8 +1,30 @@
-// import and instantiate express
-const express = require("express") // CommonJS import style!
-const app = express() // instantiate an Express object
+// import express and middlware dependencies
+import { express } from "express";
+import path from 'path';
+import { fileURLToPath } from "url";
+import multer from 'multer';
+import axios from "axios";
+import dotenv from 'dotenv';
+import morgan from "morgan";
 
-// we will put some server logic here later...
+// instantitiate express
+const app = express()
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// export the express app we created to make it available to other modules
-module.exports = app
+// use dotenv middleware
+dotenv.config({ silent: true });
+
+// use morgan middleware
+app.use(morgan('dev'));
+
+// use express body-parser
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
+app.use('static', express.static('public'));
+
+
+// put some server logic here later...
+
+export default app;
