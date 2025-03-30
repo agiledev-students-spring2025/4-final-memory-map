@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "The back-end of your project will live in this directory.",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "watch": "nodemon ./server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
