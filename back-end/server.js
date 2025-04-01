@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import server from './app.js';
-const port = 3000 // incoming requests port
+const port = 4000 // incoming requests port
 
 // call express listen function
 const listener = server.listen(port, function () {

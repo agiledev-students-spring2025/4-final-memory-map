@@ -5,27 +5,25 @@ import MapPin from './MapPin';
 import Loading from './Loading';
 
 const Map = () => {
-    
     const [pinnedLocations, setPinnedLocations] = useState([]);
 
     useEffect(() => {
-        fetch('https://my.api.mockaroo.com/location.json', {
-            headers: {
-            'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            setPinnedLocations(data);
-        })
-        .catch(error => console.error('Error fetching location:', error));
+        fetch('http://localhost:4000/query_feed?userId=7') //test for now
+            .then(response => response.json())
+            .then(data => {
+                setPinnedLocations(data);
+            })
+            .catch(error => console.error('Error fetching pins from backend:', error));
     }, []);
 
     if (pinnedLocations.length === 0) {
-        return <Loading></Loading>;
+        return <Loading />;
     }
-    
-    const centerCoordinates = [pinnedLocations[0].pin_location_latitude, pinnedLocations[0].pin_location_longitude];
+
+    const centerCoordinates = [
+        pinnedLocations[0].pinLocationLatitude,
+        pinnedLocations[0].pinLocationLongitude,
+    ];
 
     return (
         <MapContainer
