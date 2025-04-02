@@ -9,7 +9,7 @@ const Map = () => {
 
 
     useEffect(() => {
-        fetch('http://localhost:4000/query_map_pins?userId=7') //test for now
+        fetch('http://localhost:4000/query_map_pins?userId=2')
             .then(response => response.json())
             .then(data => {
                 setPinnedLocations(data);

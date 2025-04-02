@@ -6,7 +6,7 @@ const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:4000/query_feed?userId=7', {
+        fetch('http://localhost:4000/query_feed?userId=3', {
             headers: {
                 'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
             }
