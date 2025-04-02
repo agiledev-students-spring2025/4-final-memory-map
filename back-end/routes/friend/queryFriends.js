@@ -19,7 +19,7 @@ async function getAllFriends() {
     return [...filteredMockFriends, ...localFriends];
 }
 
-route.use('/query_friends', async (req, res) => {
+route.get('/query_friends', async (req, res) => {
     const { userId } = req.query;
     if (!userId) {
         return res.status(400).json({
