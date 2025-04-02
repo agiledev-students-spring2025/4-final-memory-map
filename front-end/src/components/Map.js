@@ -7,8 +7,9 @@ import Loading from './Loading';
 const Map = () => {
     const [pinnedLocations, setPinnedLocations] = useState([]);
 
+
     useEffect(() => {
-        fetch('http://localhost:4000/query_feed?userId=7') //test for now
+        fetch('http://localhost:4000/query_map_pins?userId=7') //test for now
             .then(response => response.json())
             .then(data => {
                 setPinnedLocations(data);

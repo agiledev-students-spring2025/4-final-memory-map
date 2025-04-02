@@ -5,7 +5,7 @@ import ViewEye from "./ViewEye";
 import ExpandedLocationItem from "./ExpandedLocationItem";
 
 const LocationItem = ({ location, removeLocation }) => {
-    const locationName = location.pin_name;
+    const locationName = location.pinName;
     const [viewLocationDetails, setViewLocationDetails] = useState(false);
 
     const handleClick = () => {
@@ -26,7 +26,7 @@ const LocationItem = ({ location, removeLocation }) => {
                         <button onClick={handleClick}>
                             <ViewEye status={viewLocationDetails} />
                         </button>
-                        <button onClick={() => removeLocation(location.pin_id)}>
+                        <button onClick={() => removeLocation(location.pinId)}>
                             <XIcon />
                         </button>
                     </div>
