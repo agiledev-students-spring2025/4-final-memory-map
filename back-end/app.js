@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+
 dotenv.config({ silent: true });
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -14,7 +15,13 @@ app.use(morgan('dev'));
 app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// profiles
+import profileRoutes from './routes/friend/profile.js'; 
 app.use('/static', express.static('public'));
+app.use('/uploads', express.static('uploads'));
+app.use('/profile', profileRoutes);
+
 
 /*
 import createPinRouter from './routes/pin/createPin.js';
@@ -50,5 +57,8 @@ app.use(updateUserRouter);
 app.use(getUserRouter);
 app.use(queryFriendsRouter);
 */
+
+
+
 
 export default app;
