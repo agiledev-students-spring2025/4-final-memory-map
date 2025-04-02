@@ -17,7 +17,7 @@ app.use(morgan('dev'));
 //for now!
 app.use(cors({
     origin: 'http://localhost:3000'
-  }));
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/static', express.static('public'));
@@ -149,5 +149,8 @@ app.get('/query_single_pin', async (req, res) => {
   }
   res.json(pin);
 });
+
+import queryFriendsRoute from './routes/friend/queryFriends.js';
+app.use('/query_feed', queryFriendsRoute);
 
 export default app;

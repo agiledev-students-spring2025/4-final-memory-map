@@ -1,7 +1,10 @@
+import express from 'express';
+
+const route = express.Router();
 
 let localFriends = [];
 const deletedFriendsIds = new Set();
-const MOCKAROO_URL = `https://my.api.mockaroo.com/db_users.json?key=${process.env.MOCKAROO_KEY}`;
+const MOCKAROO_URL = `https://my.api.mockaroo.com/db_user.json?key=${process.env.MOCKAROO_KEY}`;
 async function getAllFriends() {
     let mockFriends = [];
     try {
@@ -16,7 +19,7 @@ async function getAllFriends() {
     return [...filteredMockFriends, ...localFriends];
 }
 
-app.query_friends('/query_friends', async (req, res) => {
+route.use('/query_friends', async (req, res) => {
     const { userId } = req.query;
     if (!userId) {
         return res.status(400).json({
@@ -30,3 +33,5 @@ app.query_friends('/query_friends', async (req, res) => {
     });
     res.json(friends);
 });
+
+export default route;

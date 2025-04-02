@@ -9,11 +9,7 @@ const Friends = () => {
     const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        fetch('https://my.api.mockaroo.com/friends_page_test.json', {
-            headers: {
-                'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
-            }
-        })
+        fetch('http://localhost:4000/query_friends?userId=2')
         .then(response => response.json())
         .then(data => {
             if (Array.isArray(data)) {
@@ -35,7 +31,7 @@ const Friends = () => {
     }, [friends]);
 
     const removeFriend = (userId) => {
-        setFriends(friends.filter(friend => friend.user_id !== userId));
+        setFriends(friends.filter(friend => friend.userId !== userId));
     };
 
     if (hasError) {
@@ -47,7 +43,7 @@ const Friends = () => {
     }
 
     const filteredFriends = friends.filter(friend =>
-        `${friend.first_name} ${friend.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
+        `${friend.firstName} ${friend.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -57,7 +53,7 @@ const Friends = () => {
             <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {filteredFriends.length} friends </div>
             <div className="flex-1 overflow-y-auto">
                 {filteredFriends.map(friend => (
-                    <FriendItem key={friend.user_id} friend={friend} removeFriend={removeFriend} />
+                    <FriendItem key={friend.userId} friend={friend} removeFriend={removeFriend} />
                 ))}
             </div>
         </div>
