@@ -6,7 +6,7 @@ const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
 
     useEffect(() => {
-        fetch('https://my.api.mockaroo.com/location.json', {
+        fetch('http://localhost:4000/query_feed?userId=3', {
             headers: {
                 'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
             }
@@ -28,7 +28,7 @@ const Feeds = () => {
             <div className="text-xl font-bold p-3.5">Feed</div>
             <div className="flex-1 overflow-y-auto w-full">
                 {pinnedLocations.map(location => (
-                    <LocationItem key={location.pin_id} location={location} removeLocation={removeLocation} />
+                    <LocationItem key={location.pinId} location={location} removeLocation={removeLocation} />
                 ))}
             </div>
         </div>
