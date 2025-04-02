@@ -8,6 +8,7 @@ import morgan from "morgan";
 import cors from 'cors';
 
 
+
 dotenv.config({ silent: true });
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -20,7 +21,13 @@ app.use(cors({
   }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// profiles
+import profileRoutes from './routes/friend/profile.js'; 
 app.use('/static', express.static('public'));
+app.use('/uploads', express.static('uploads'));
+app.use('/profile', profileRoutes);
+
 
 let localPins = [];
 const deletedPinIds = new Set();
@@ -149,5 +156,8 @@ app.get('/query_single_pin', async (req, res) => {
   }
   res.json(pin);
 });
+
+
+
 
 export default app;
