@@ -9,7 +9,7 @@ const Friends = () => {
     const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        fetch('http://localhost:4000/query_friends?userId=2')
+        fetch('http://localhost:4000/query_friends?userId=3')
         .then(response => response.json())
         .then(data => {
             if (Array.isArray(data)) {
