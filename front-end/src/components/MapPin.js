@@ -23,6 +23,7 @@ const MapPin = ({ pinData }) => {
     createdAt, 
     pinDescription 
   } = pinData;
+  const formattedDate = new Date(createdAt * 1000).toLocaleString();
 
   if (typeof pinLocationLatitude !== 'number' || typeof pinLocationLongitude !== 'number') return null;
 
@@ -47,7 +48,7 @@ const MapPin = ({ pinData }) => {
               {pinLocationCity}, {pinLocationCountry}
             </div>
             <div className="text-xs text-gray-500 mb-2">
-              Created at: {createdAt}
+              Created at: {formattedDate}
             </div>
             <p className="text-gray-700">{pinDescription}</p>
           </div>
