@@ -23,8 +23,9 @@ app.use('/uploads', express.static('uploads'));
 app.use('/profile', profileRoutes);
 
 
-/*
+
 import createPinRouter from './routes/pin/createPin.js';
+/*
 import deletePinRouter from './routes/pin/deletePin.js';
 */
 import queryFeedRouter from './routes/pin/queryFeed.js';
@@ -43,8 +44,9 @@ import queryFriendsRouter from './routes/friend/queryFriends.js';
 app.use(queryMapPinsRouter);
 app.use(queryFeedRouter);
 
-/*
+
 app.use(createPinRouter);
+/*
 app.use(deletePinRouter);
 app.use(querySinglePinRouter);
 */

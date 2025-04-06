@@ -1,3 +1,17 @@
-The back-end of your project will live in this directory.
+To run this project
 
-You will most likely initiate the back-end Node.js/Express.js server by running the "npm init" command from within this directory.
+- cd backend
+- npm install
+- npm run dev
+
+You can find the .env info on discord
+
+Then run the front end
+
+- cd front end
+- npm install
+- npm run start
+
+For testing
+
+TODO

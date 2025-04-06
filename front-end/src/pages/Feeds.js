@@ -4,7 +4,6 @@ import Loading from '../components/Loading';
 
 const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
-
     useEffect(() => {
         fetch('http://localhost:4000/query_feed?userId=3', {
             headers: {
@@ -27,8 +26,8 @@ const Feeds = () => {
         <div className="flex flex-col mx-auto p-3 h-full items-center">
             <div className="text-xl font-bold p-3.5">Feed</div>
             <div className="flex-1 overflow-y-auto w-full">
-                {pinnedLocations.map(location => (
-                    <LocationItem key={location.pinId} location={location} removeLocation={removeLocation} />
+                {pinnedLocations.map((location, index) => (
+                    <LocationItem key={index} location={location} removeLocation={removeLocation} />
                 ))}
             </div>
         </div>
