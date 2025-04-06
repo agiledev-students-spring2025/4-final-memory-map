@@ -9,19 +9,13 @@ const Friends = () => {
     const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        fetch('https://my.api.mockaroo.com/friends_page_test.json', {
+        fetch('http://localhost:4000/query_friends?userId=3', {
             headers: {
                 'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
             }
         })
         .then(response => response.json())
-        .then(data => {
-            if (Array.isArray(data)) {
-                setFriends(data);
-            } else {
-                setHasError(true);
-            }
-        })
+        .then(data => setFriends(data))
         .catch(error => console.error('Error fetching friends:', error));
     }, []);
 
@@ -35,7 +29,7 @@ const Friends = () => {
     }, [friends]);
 
     const removeFriend = (userId) => {
-        setFriends(friends.filter(friend => friend.user_id !== userId));
+        setFriends(friends.filter(friend => friend.userId !== userId));
     };
 
     if (hasError) {
@@ -46,18 +40,14 @@ const Friends = () => {
         return <Loading></Loading>;
     }
 
-    const filteredFriends = friends.filter(friend =>
-        `${friend.first_name} ${friend.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
         <div className="flex flex-col mx-auto h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <div className="text-xl font-bold p-3.5 pb-0"> Social Circle </div>
-            <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {filteredFriends.length} friends </div>
+            <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {friends.length} friends </div>
             <div className="flex-1 overflow-y-auto">
-                {filteredFriends.map(friend => (
-                    <FriendItem key={friend.user_id} friend={friend} removeFriend={removeFriend} />
+                {friends.map(friend => (
+                    <FriendItem key={friend.userId} friend={friend} removeFriend={removeFriend} />
                 ))}
             </div>
         </div>

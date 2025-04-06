@@ -37,8 +37,8 @@ import createUserRouter from './routes/user/createUser.js';
 import deleteUserRouter from './routes/user/deleteUser.js';
 import updateUserRouter from './routes/user/updateUser.js';
 import getUserRouter from './routes/user/getUser.js';
-import queryFriendsRouter from './routes/friends/queryFriends.js';
 */
+import queryFriendsRouter from './routes/friend/queryFriends.js';
 
 app.use(queryMapPinsRouter);
 app.use(queryFeedRouter);
@@ -55,8 +55,8 @@ app.use(createUserRouter);
 app.use(deleteUserRouter);
 app.use(updateUserRouter);
 app.use(getUserRouter);
-app.use(queryFriendsRouter);
 */
+app.use(queryFriendsRouter);
 
 
 
