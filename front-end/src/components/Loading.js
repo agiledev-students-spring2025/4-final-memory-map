@@ -9,9 +9,9 @@ const Loading = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold flex items-center space-x-1">
-        <span>Loading</span>
+    <div className="flex justify-center min-h-[80vh]">
+      <h1 className="text-2xl font-bold flex items-center space-x-2">
+        <div>Loading</div>
         <span className="flex">
           <span
             className={`w-2 h-2 mx-0.5 bg-gray-600 rounded-full transition-opacity ${
@@ -38,4 +38,3 @@ const Loading = () => {
 };
 
 export default Loading;
-
