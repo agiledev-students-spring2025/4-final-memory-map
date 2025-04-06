@@ -9,15 +9,13 @@ const Friends = () => {
     const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        fetch('http://localhost:4000/query_friends?userId=3')
-        .then(response => response.json())
-        .then(data => {
-            if (Array.isArray(data)) {
-                setFriends(data);
-            } else {
-                setHasError(true);
+        fetch('http://localhost:4000/query_friends?userId=3', {
+            headers: {
+                'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
             }
         })
+        .then(response => response.json())
+        .then(data => setFriends(data))
         .catch(error => console.error('Error fetching friends:', error));
     }, []);
 
@@ -42,17 +40,13 @@ const Friends = () => {
         return <Loading></Loading>;
     }
 
-    const filteredFriends = friends.filter(friend =>
-        `${friend.firstName} ${friend.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
         <div className="flex flex-col mx-auto h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <div className="text-xl font-bold p-3.5 pb-0"> Social Circle </div>
-            <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {filteredFriends.length} friends </div>
+            <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {friends.length} friends </div>
             <div className="flex-1 overflow-y-auto">
-                {filteredFriends.map(friend => (
+                {friends.map(friend => (
                     <FriendItem key={friend.userId} friend={friend} removeFriend={removeFriend} />
                 ))}
             </div>
