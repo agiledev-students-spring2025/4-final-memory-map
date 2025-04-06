@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PinIcon from "./icons/PinIcon";
-import XIcon from "./icons/XIcon";
 import ViewEye from "./ViewEye";
 import ExpandedLocationItem from "./ExpandedLocationItem";
 
@@ -25,9 +24,6 @@ const LocationItem = ({ location, removeLocation }) => {
                     <div className="flex flex-row gap-3">
                         <button onClick={handleClick}>
                             <ViewEye status={viewLocationDetails} />
-                        </button>
-                        <button onClick={() => removeLocation(location.pinId)}>
-                            <XIcon />
                         </button>
                     </div>
                 </div>
