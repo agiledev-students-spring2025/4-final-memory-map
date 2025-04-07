@@ -28,6 +28,7 @@ import queryMapPinsRouter from './routes/pin/queryMapPins.js';
 import deleteFriendRouter from './routes/friend/deleteFriend.js';
 import getUserRouter from './routes/friend/getUser.js';
 import deleteUserRouter from './routes/friend/deleteUser.js';
+import updatePinRouter from './routes/pin/updatePin.js';
 
 
 /*
@@ -43,6 +44,8 @@ app.use(createPinRouter);
 app.use(deletePinRouter);
 app.use(getUserRouter);
 app.use(deleteUserRouter);
+app.use(updatePinRouter);
+
 
 
 /*
