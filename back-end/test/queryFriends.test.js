@@ -21,12 +21,13 @@ describe('GET request to /query_friends route', () => {
 
 
 
-    it('it should respond with an HTTP 500 status', done => {
+    it('it should respond with an HTTP 400 status: no user id', done => {
         request
             .execute(app)
-            .get('/query_friends?userId=101')
+            .get('/query_friends?user_id=')
             .end((err, res) => {
-                expect(res).to.have.status(500);
+                expect(res).to.have.status(400);
+                done();
             });
     });
 
