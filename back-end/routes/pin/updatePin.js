@@ -30,7 +30,7 @@ router.put('/update_pin', upload.single('image'), (req, res) => {
   const index = localPins.findIndex(pin => pin.pinId === Number(pinId));
   if (index === -1) return res.status(404).json({ error: 'Pin not found.' });
 
-  // 更新字段（如果提供）
+
   if (pinName) localPins[index].pinName = pinName;
   if (pinDescription) localPins[index].pinDescription = pinDescription;
   if (locationLatitude) localPins[index].locationLatitude = locationLatitude;
