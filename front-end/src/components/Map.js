@@ -57,7 +57,7 @@ const Map = () => {
   const [rightClickLocation, setRightClickLocation] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:4000/query_map_pins?userId=2')
+    fetch('http://localhost:4000/query_map_pins?userId=3')
       .then((response) => response.json())
       .then((data) => {
         setPinnedLocations(data);

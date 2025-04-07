@@ -4,10 +4,10 @@ import multer from "multer";
 const router = express.Router();
 let localUsers = [];
 router.post('/create_user', async (req, res) => {
-    const { user_id, username, 
+    const { user_id, 
+        username, 
         first_name, 
         last_name, 
-        profile_picture, 
         email, 
         gender, 
         birthdate, 
@@ -36,11 +36,11 @@ router.post('/create_user', async (req, res) => {
         username, 
         first_name, 
         last_name, 
-        profile_picture, 
         email, 
         gender, 
         birthdate, 
         password, 
+        profile_picture,
         allFriendsId: [], 
         allPinsId: [], 
         createdAt: new Date() 
