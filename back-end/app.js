@@ -29,9 +29,8 @@ import deleteFriendRouter from './routes/friend/deleteFriend.js';
 import getUserRouter from './routes/friend/getUser.js';
 import deleteUserRouter from './routes/friend/deleteUser.js';
 
-
+import createUserRouter from './routes/friend/createUser.js';
 /*
-import createUserRouter from './routes/user/createUser.js';
 import updateUserRouter from './routes/user/updateUser.js';
 */
 import queryFriendsRouter from './routes/friend/queryFriends.js';
@@ -45,9 +44,8 @@ app.use(getUserRouter);
 app.use(deleteUserRouter);
 
 
-/*
-
 app.use(createUserRouter);
+/*
 app.use(updateUserRouter);
 app.use(getUserRouter);
 */
