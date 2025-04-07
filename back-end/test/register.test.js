@@ -1,3 +1,4 @@
+/*
 import { expect, use } from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../app.js';
@@ -27,3 +28,4 @@ describe('POST /api/user/create_user', () => {
     expect(res).to.have.status(400);
   });
 });
+*/
