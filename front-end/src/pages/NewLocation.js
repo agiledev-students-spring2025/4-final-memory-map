@@ -105,28 +105,6 @@ const NewLocation = () => {
                 encType="multipart/form-data"
             >
                 <div>
-                    <label className="block text-gray-800 font-medium mb-1">Latitude</label>
-                    <input
-                        type="text"
-                        name="locationLatitude"
-                        value={postData.locationLatitude}
-                        readOnly
-                        className="w-full px-4 py-2 border rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-gray-800 font-medium mb-1">Longitude</label>
-                    <input
-                        type="text"
-                        name="locationLongitude"
-                        value={postData.locationLongitude}
-                        readOnly
-                        className="w-full px-4 py-2 border rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                </div>
-
-                <div>
                     <label className="block text-gray-800 font-medium mb-1">City, Country</label>
                     <div className="w-full px-4 py-2 bg-gray-50 border rounded-md text-gray-600">
                         {cityCountry || 'Loading...'}
