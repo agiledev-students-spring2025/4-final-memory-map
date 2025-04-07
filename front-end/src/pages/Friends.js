@@ -16,7 +16,10 @@ const Friends = () => {
         })
         .then(response => response.json())
         .then(data => setFriends(data))
-        .catch(error => console.error('Error fetching friends:', error));
+        .catch(error => {
+            console.error('Error fetching friends:', error);
+            setHasError(true);
+        });
     }, []);
 
     useEffect(() => {
@@ -29,7 +32,7 @@ const Friends = () => {
     }, [friends]);
 
     const removeFriend = (userId) => {
-        setFriends(friends.filter(friend => friend.userId !== userId));
+        setFriends(prevFriends => prevFriends.filter(friend => friend.userId !== userId));
     };
 
     if (hasError) {
@@ -37,16 +40,23 @@ const Friends = () => {
     }
 
     if (friends === null) {
-        return <Loading></Loading>;
+        return <Loading />;
     }
+
+    const filteredFriends = friends.filter(friend => {
+        const fullName = `${friend?.firstName || ''} ${friend?.lastName || ''}`;
+        return fullName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
     return (
         <div className="flex flex-col mx-auto h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-            <div className="text-xl font-bold p-3.5 pb-0"> Social Circle </div>
-            <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0"> {friends.length} friends </div>
+            <div className="text-xl font-bold p-3.5 pb-0">Social Circle</div>
+            <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0">
+                {filteredFriends.length} {filteredFriends.length === 1 ? 'friend' : 'friends'}
+            </div>
             <div className="flex-1 overflow-y-auto">
-                {friends.map(friend => (
+                {filteredFriends.map(friend => (
                     <FriendItem key={friend.userId} friend={friend} removeFriend={removeFriend} />
                 ))}
             </div>

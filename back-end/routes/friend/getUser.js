@@ -1,44 +1,33 @@
-import express from "express";
+//getUser.js
+import express from 'express';
+import axios from 'axios';
+import dotenv from 'dotenv';
 
-const router = express.Router();
+dotenv.config();
+const route = express.Router();
+const MOCKAROO_URL = `https://my.api.mockaroo.com/db_user.json?key=${process.env.MOCKAROO_KEY}`;
 
-let localUsers = []; 
+route.get('/get_user', async (req, res) => {
+  const { userId } = req.query;
 
-export const setLocalUsers = (users) => {
-  localUsers = users;
-};
-
-router.get('/get_user', (req, res) => {
-  const { username, user_id } = req.query;
-
-  let foundUser = null;
-
-  if (username) {
-    foundUser = localUsers.find(user => user.username === username);
-  } else if (user_id) {
-    foundUser = localUsers.find(user => String(user.user_id) === String(user_id));
-  } else {
-    return res.status(400).json({ error: "No input" });
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required.' });
   }
 
-  if (!foundUser) {
-    return res.status(404).json({ error: "Not found" });
-  }
+  try {
+    const response = await axios.get(MOCKAROO_URL);
+    const allUsers = response.data;
+    const user = allUsers.find(user => user.userId === Number(userId));
 
-  return res.status(200).json({
-    user: {
-      user_id: foundUser.user_id,
-      username: foundUser.username,
-      email: foundUser.email,
-      profile_picture: foundUser.profile_picture,
-      first_name: foundUser.first_name,
-      last_name: foundUser.last_name,
-      gender: foundUser.gender,
-      birthdate: foundUser.birthdate,
-      allFriendsId: foundUser.allFriendsId,
-      allPinsId: foundUser.allPinsId
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
     }
-  });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching data from Mockaroo:', error.message);
+    res.status(500).json({ error: 'Failed to fetch user data from Mockaroo' });
+  }
 });
 
-export default router;
+export default route;

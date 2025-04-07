@@ -24,8 +24,7 @@ router.get('/query_feed', async (req, res) => {
     const allPins = responsePins.data;
     const userRecord = allUser.find(user => user.userId === Number(userId));
     const friendsList = (userRecord && Array.isArray(userRecord.allFriendsId)) ? userRecord.allFriendsId : [];
-    console.log(friendsList);
-    
+        
     //either 1 which means the pin is public
     //or 3 the pin is private but the user is the owner of the pin
     //or 2 the pin is friends only and the user is in the friends list
