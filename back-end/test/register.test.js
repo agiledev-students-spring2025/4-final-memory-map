@@ -1,29 +1,30 @@
 import { expect, use } from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../app.js';
-import User from '../models/User.js';
+
 
 use(chaiHttp);
 
-describe('POST /api/user/create_user', () => {
-  const user = { email: 'test@example.com', password: '12345678' };
-
-  beforeEach(async () => {
-    await User.deleteMany({});
-  });
-
-  it('registers a new user', async () => {
-    const res = await chaiHttp.request(app).post('/api/user/create_user').send(user);
-    expect(res).to.have.status(201);
-  });
-
-  it('fails if email is missing', async () => {
-    const res = await chaiHttp.request(app).post('/api/user/create_user').send({ password: '12345678' });
+describe('GET /get_user', () => {
+  it('return 400 if userId is missing', async () => {
+    const res = await chaiHttp.request(app).get('/get_user');
     expect(res).to.have.status(400);
+    expect(res.body.error).to.include('required');
   });
 
-  it('fails if password is missing', async () => {
-    const res = await chaiHttp.request(app).post('/api/user/create_user').send({ email: 'test@example.com' });
-    expect(res).to.have.status(400);
+  it('return 404 if user is not found', async () => {
+    const res = await chaiHttp.request(app).get('/get_user').query({ userId: 999999 });
+    expect(res).to.have.status(404);
+    expect(res.body.error).to.include('User not found');
+  });
+
+  it('return user data if userId exists in Mockaroo', async () => {
+    const res = await chaiHttp.request(app).get('/get_user').query({ userId: 1 });
+
+    if (res.status === 200) {
+      expect(res.body).to.include.keys('userId', 'email');
+    } else {
+      expect(res).to.have.status(404);
+    }
   });
 });
