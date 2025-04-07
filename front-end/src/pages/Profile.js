@@ -3,35 +3,32 @@ import EditPicIcon from '../components/icons/EditPicIcon';
 import ProfileNav from '../components/ProfileNav';
 
 const Profile = () => {
-  const [user, setUser] = useState({ first_name: "", last_name: "", username: "" });
+  const [user, setUser] = useState({ firstName: "", lastName: "", username: "" });
   const [CurrComponent, setCurrComponent] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showUpload, setShowUpload] = useState(false);
 
   useEffect(() => {
-    fetch('https://my.api.mockaroo.com/friends_page_test.json', {
-      headers: {
-        'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
-      }
-    })
+    const userId = 3;
+    fetch(`http://localhost:4000/get_user?userId=${userId}`)
       .then(response => response.json())
       .then(data => {
-        const rd = Math.floor(Math.random() * data.length);
-        const selected = data[rd];
         setUser({
-          first_name: selected?.first_name || "First",
-          last_name: selected?.last_name || "Last",
-          username: selected?.username || "unknown"
+          firstName: data.firstName || "First",
+          lastName: data.lastName || "Last",
+          username: data.userName || "unknown"
         });
-        setProfileImageUrl(`https://picsum.photos/seed/${selected?.username}/100`);
+        setProfileImageUrl(data.profilePicture);
       })
       .catch(error => console.error("Error fetching user data:", error));
   }, []);
 
   useEffect(() => {
     if (user) {
-      setCurrComponent(<ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={user} />);
+      setCurrComponent(
+        <ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={user} />
+      );
     }
   }, [user]); 
 
@@ -89,7 +86,7 @@ const Profile = () => {
       )}
 
       <h1 className="font-bold mt-5 flex justify-center">
-        {user.first_name} {user.last_name}
+        {user.firstName} {user.lastName}
       </h1>
       <p className="font-light flex text-xs justify-center">
         @{user.username}
