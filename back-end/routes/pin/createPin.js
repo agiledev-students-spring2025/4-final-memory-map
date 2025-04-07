@@ -17,6 +17,11 @@ const upload = multer({ storage });
 
 router.post('/create_pin', upload.single('image'), (req, res) => {
     const { pinName, pinDescription, locationLatitude, locationLongitude } = req.body;
+
+    if (!req.file) {
+        return res.status(500).json({ error: 'Image file is missing' });
+    }
+    
     const imageUrl = `/uploads/${req.file.filename}`;
 
     const newPinData = {
