@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';  
 import Button from "../components/Button";
@@ -11,8 +12,8 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isChecked, setIsChecked] = useState(false);
     const navigate = useNavigate();
-
-    const handleRegister = (event) => {
+    
+    const handleRegister = async (event) => {
         event.preventDefault();
 
         if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
@@ -26,14 +27,43 @@ const Register = () => {
         }
 
         if (!isChecked) {
-          alert("You must agree to the Terms of Service.");
-          return;
+            alert("You must agree to the Terms of Service.");
+            return;
         }
 
-        console.log("Register button clicked"); 
-        navigate("/landing");
-      };
-    
+        const newUser = {
+            user_id: 55,
+            username,
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            gender: "",        
+            birthdate: "", 
+            password
+        };
+
+        try {
+            const response = await fetch('http://localhost:4000/create_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newUser)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("User created", data);
+                navigate("/landing");
+            } else {
+                alert("Failed to create user. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An unexpected error occurred.");
+        }
+    };
+
     return (
         <div className="flex flex-col mx-auto p-4 h-full">
             <h2 className="text-left text-2xl font-bold text-black-500">Sign Up</h2>
@@ -126,7 +156,7 @@ const Register = () => {
                 </p>
             </form>
         </div>
-    )
+    );
 }
 
 export default Register;
