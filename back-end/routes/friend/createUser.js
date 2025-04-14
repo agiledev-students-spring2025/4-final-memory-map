@@ -12,7 +12,6 @@ router.post('/create_user', (req, res) => {
         last_name, 
         email, 
         gender, 
-        birthdate, 
         password 
     } = req.body;
 
@@ -27,7 +26,6 @@ router.post('/create_user', (req, res) => {
         last_name,
         email,
         gender,
-        birthdate,
         password,
         profile_picture: "https://robohash.org/suntautnisi.png?size=50x50&set=set1",
         allFriendsId: [],
