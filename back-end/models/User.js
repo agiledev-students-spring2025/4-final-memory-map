@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = require.Schema;
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const jwtStrategy = require('../config/jwt-config.js');
 
 const UserSchema = new Schema({
     _id: {
