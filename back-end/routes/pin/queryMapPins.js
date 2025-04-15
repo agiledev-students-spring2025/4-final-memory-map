@@ -1,30 +1,28 @@
 import express from 'express';
-import axios from 'axios';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import Pin from '../../models/Pin.js';
+import { authenticate } from '../auth.js';
 
 const router = express.Router();
 
-const MOCKAROO_PINS_URL = `https://my.api.mockaroo.com/db_pins.json?key=${process.env.MOCKAROO_KEY}`;
+router.get('/query_map_pins', authenticate, async (req, res) => {
+    try {
+        const pins = await Pin.find({ author: req.user._id });
+        const transformedPins = pins.map(pin => ({
+            id: pin._id,
+            title: pin.title,
+            description: pin.description,
+            latitude: pin.location.coordinates[1],
+            longitude: pin.location.coordinates[0],
+            imageUrl: pin.imageUrl,
+            author: pin.author,
+            createdAt: pin.createdAt
+        }));
 
-router.get('/query_map_pins', async (req, res) => {
-  const { userId } = req.query;
-
-  if (!userId) {
-    return res.status(400).json({ error: 'userId is required.' });
-  }
-
-  try {
-    const response = await axios.get(MOCKAROO_PINS_URL);
-    const allPins = response.data;
-    //replace later with mongodb filter
-    const userPins = allPins.filter(pin => pin.userId === Number(userId));
-    res.json(userPins);
-  } catch (error) {
-    console.error('Error fetching data from Mockaroo:', error.message);
-    res.status(500).json({ error: 'Failed to fetch pin data from Mockaroo.' });
-  }
+        res.json(transformedPins);
+    } catch (error) {
+        console.error('Error fetching pins from MongoDB:', error.message);
+        res.status(500).json({ error: 'Failed to fetch pins from database.' });
+    }
 });
 
 export default router;

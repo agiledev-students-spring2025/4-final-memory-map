@@ -1,10 +1,11 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import { body, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import User from '../../models/User.js';
 import { generateToken } from '../../config/jwt.js';
 import { authenticate } from '../auth.js';
+import { validateLogin } from '../validators.js';
 
 const router = express.Router();
 
@@ -25,12 +26,7 @@ router.post('/', upload.single('avatar'), (req, res) => {
   
     const fileUrl = `/uploads/${req.file.filename}`;
     res.json({ fileUrl });
-  });
-
-const validateLogin = [
-    body('username').trim().notEmpty().withMessage('Username is required'),
-    body('password').notEmpty().withMessage('Password is required')
-];
+});
 
 router.post('/login', validateLogin, async (req, res) => {
     try {
