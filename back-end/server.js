@@ -1,14 +1,13 @@
-#!/usr/bin/env node
-
 import server from './app.js';
-const port = 4000 // incoming requests port
+import connectDB from './config/db.js';
+const port = 4000
 
-// call express listen function
+connectDB();
+
 const listener = server.listen(port, function () {
   console.log(`Server running on port: ${port}`)
 });
 
-// listener port function
 const close = () => {
   listener.close()
 };
