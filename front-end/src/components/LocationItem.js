@@ -5,7 +5,6 @@ import ExpandedLocationItem from "./ExpandedLocationItem";
 
 
 const LocationItem = ({ location, removeLocation }) => {
-    const locationName = location.pinName;
     const [locationUser, setLocationUser] = useState(null);
     const [hasError, setHasError] = useState(false);
 
@@ -22,32 +21,30 @@ const LocationItem = ({ location, removeLocation }) => {
             setHasError(true);
         });
     }, )
-    const [viewLocationDetails, setViewLocationDetails] = useState(false);
 
-    const handleClick = () => {
-        setViewLocationDetails(!viewLocationDetails);
-    };
-
-    return (
-        <>
-            <div className="flex justify-between w-full py-3.5">
-                <div>
-                    <div className="flex gap-3">
-                        <PinIcon />
-                        <span className="text-lg">{locationUser.firstName}</span>
+    if (locationUser) {
+        return (
+            <>
+                <div className="flex justify-between w-full py-3.5">
+                    <div>
+                        <div className="flex gap-3">
+                            <PinIcon />
+                            <span className="text-lg">{locationUser.firstName}</span>
+                        </div>
                     </div>
                 </div>
+                <ExpandedLocationItem viewDetails={true} location={location} />
+            </>
+        );
+    } else {
+        return (
+            <>
                 <div>
-                    <div className="flex flex-row gap-3">
-                        <button onClick={handleClick}>
-                            <ViewEye status={viewLocationDetails} />
-                        </button>
-                    </div>
+                    Loading post
                 </div>
-            </div>
-            <ExpandedLocationItem viewDetails={viewLocationDetails} location={location} />
-        </>
-    );
+            </>
+        )
+    }
 };
 
 export default LocationItem;
