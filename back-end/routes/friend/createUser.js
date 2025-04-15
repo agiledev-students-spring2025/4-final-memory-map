@@ -1,11 +1,12 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import User from '../../models/User.js';
+import { generateToken } from '../../config/jwt.js';
 import { validateRegistration } from '../validators.js';
 
 const router = express.Router();
 
-router.post('/', validateRegistration, async (req, res) => {
+router.post('/register', validateRegistration, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -25,10 +26,24 @@ router.post('/', validateRegistration, async (req, res) => {
         const user = new User({ username, email, password });
         await user.save();
 
-        res.status(201).json({ message: 'User created successfully' });
+        const token = generateToken(user._id);
+
+        res.status(201).json({
+            message: 'Registration successful',
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                profilePicture: user.profilePicture
+            }
+        });
     } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).json({ error: 'Failed to create user' });
+        console.error('Registration error:', error);
+        res.status(500).json({ 
+            error: 'Server error during registration',
+            details: error.message 
+        });
     }
 });
 
