@@ -1,51 +1,50 @@
 import express from 'express';
-import multer from 'multer';
+import { validationResult } from 'express-validator';
+import User from '../../models/User.js';
+import { generateToken } from '../../config/jwt.js';
+import { validateRegistration } from '../validators.js';
 
 const router = express.Router();
-let localUsers = [];
 
-router.post('/create_user', (req, res) => {
-    const { 
-        user_id, 
-        username, 
-        first_name, 
-        last_name, 
-        email, 
-        gender, 
-        password 
-    } = req.body;
+router.post('/register', validateRegistration, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 
-    if (!user_id || !username || !first_name || !last_name) {
-        return res.status(400).send("Error");
+        const { username, email, password } = req.body;
+
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({ 
+                error: 'User already exists',
+                field: existingUser.email === email ? 'email' : 'username'
+            });
+        }
+
+        const user = new User({ username, email, password });
+        await user.save();
+
+        const token = generateToken(user._id);
+
+        res.status(201).json({
+            message: 'Registration successful',
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                profilePicture: user.profilePicture
+            }
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ 
+            error: 'Server error during registration',
+            details: error.message 
+        });
     }
-
-    const newUser = {
-        user_id,
-        username,
-        first_name,
-        last_name,
-        email,
-        gender,
-        password,
-        profile_picture: "https://robohash.org/suntautnisi.png?size=50x50&set=set1",
-        allFriendsId: [],
-        allPinsId: [],
-        createdAt: new Date(),
-    };
-
-    localUsers.push(newUser);
-
-    console.log('New User:', newUser);
-
-    res.status(201).json({
-        message: 'User created',
-        user: {
-            user_id: newUser.user_id,
-            username: newUser.username,
-            email: newUser.email,
-            profile_picture: newUser.profile_picture,
-        },
-    });
 });
 
 export default router;

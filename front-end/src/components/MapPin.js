@@ -14,43 +14,41 @@ L.Icon.Default.mergeOptions({
 
 const MapPin = ({ pinData }) => {
   const { 
-    pinLocationLatitude, 
-    pinLocationLongitude, 
-    pinName, 
+    latitude, 
+    longitude, 
+    title, 
     imageUrl, 
-    pinLocationCity, 
-    pinLocationCountry, 
-    createdAt, 
-    pinDescription 
+    description,
+    createdAt 
   } = pinData;
-  const formattedDate = new Date(createdAt * 1000).toLocaleString();
 
-  if (typeof pinLocationLatitude !== 'number' || typeof pinLocationLongitude !== 'number') return null;
+  if (typeof latitude !== 'number' || typeof longitude !== 'number') return null;
 
   return (
-    <Marker position={[pinLocationLatitude, pinLocationLongitude]}>
+    <Marker position={[latitude, longitude]}>
       <Popup>
         <div className="w-full max-w-full">
           <div className="bg-white p-4 rounded">
-            <h2 className="text-xl font-bold mb-2">{pinName}</h2>
-            <img
-              src={imageUrl}
-              alt={pinName}
-              className="w-1/4 h-1/4 mb-2 rounded"
-            />
-            <button
-              className="text-blue-500 underline text-xs mb-2"
-              onClick={() => window.open(imageUrl, '_blank')}
-            >
-              View Original Size Image
-            </button>
-            <div className="text-sm text-gray-600 mb-2">
-              {pinLocationCity}, {pinLocationCountry}
+            <h2 className="text-xl font-bold mb-2">{title}</h2>
+            {imageUrl && (
+              <>
+                <img
+                  src={imageUrl}
+                  alt={title}
+                  className="w-full h-48 object-cover mb-2 rounded"
+                />
+                <button
+                  className="text-blue-500 underline text-xs mb-2"
+                  onClick={() => window.open(imageUrl, '_blank')}
+                >
+                  View Original Size Image
+                </button>
+              </>
+            )}
+            <p className="text-sm text-gray-600 mb-2">{description}</p>
+            <div className="text-xs text-gray-500">
+              Created: {new Date(createdAt).toLocaleString()}
             </div>
-            <div className="text-xs text-gray-500 mb-2">
-              Created at: {formattedDate}
-            </div>
-            <p className="text-gray-700">{pinDescription}</p>
           </div>
         </div>
       </Popup>

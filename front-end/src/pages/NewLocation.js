@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import Button from "../components/Button";
+import axios from 'axios';
 
 const NewLocation = () => {
     const location = useLocation();
@@ -11,16 +12,19 @@ const NewLocation = () => {
     const fromMap = location.state?.fromMap ?? false;
 
     const [postData, setPostData] = useState({
-        locationLatitude: lat,
-        locationLongitude: lng,
-        pinName: '',
-        pinDescription: '',
-        visibility: '1', // 1: public, 2: friends only, 3: private
+        title: '',
+        description: '',
+        latitude: lat,
+        longitude: lng,
+        visibility: '1' // 1: public, 2: friends only, 3: private
     });
 
     const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const [missingLocation, setMissingLocation] = useState(false);
     const [cityCountry, setCityCountry] = useState('');
+    const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!lat || !lng) {
@@ -45,39 +49,57 @@ const NewLocation = () => {
     };
 
     const handleFileChange = (e) => {
-        setImageFile(e.target.files[0]);
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setIsSubmitting(true);
 
-        if (!postData.pinName || !postData.pinDescription || !imageFile) {
-            alert("Please fill out all fields and upload an image.");
+        if (!postData.title || !postData.description) {
+            setError("Please fill out all fields.");
+            setIsSubmitting(false);
             return;
         }
 
         const formData = new FormData();
-        formData.append('pinName', postData.pinName);
-        formData.append('pinDescription', postData.pinDescription);
-        formData.append('locationLatitude', postData.locationLatitude);
-        formData.append('locationLongitude', postData.locationLongitude);
+        formData.append('title', postData.title);
+        formData.append('description', postData.description);
+        formData.append('latitude', postData.latitude);
+        formData.append('longitude', postData.longitude);
         formData.append('visibility', postData.visibility);
-        formData.append('image', imageFile);
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
 
         try {
-            const response = await fetch("http://localhost:4000/create_pin", {
-                method: "POST",
-                body: formData,
+            const token = localStorage.getItem('token');
+            const response = await axios.post('http://localhost:4000/create', formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
             });
 
-            if (response.ok) {
-                console.log("Location created successfully!");
-                navigate("/landing");
+            if (response.data.message === 'Pin created successfully') {
+                navigate('/landing');
             } else {
-                console.error("Upload failed:", response.status);
+                setError('Failed to create pin. Please try again.');
             }
         } catch (error) {
-            console.error("Network error:", error);
+            console.error('Create pin error:', error);
+            setError(error.response?.data?.error || 'Failed to create pin. Please try again.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -97,46 +119,61 @@ const NewLocation = () => {
     }
 
     return (
-        <div className="max-w-xl mx-auto p-6 bg-white rounded-lg">
-            <h1 className="text-2xl font-bold text-center mb-6">New Location</h1>
-            <form
-                className="space-y-5"
-                onSubmit={handleSubmit}
-                encType="multipart/form-data"
-            >
-                <div>
-                    <label className="block text-gray-800 font-medium mb-1">City, Country</label>
-                    <div className="w-full px-4 py-2 bg-gray-50 border rounded-md text-gray-600">
-                        {cityCountry || 'Loading...'}
-                    </div>
+        <div className="flex flex-col mx-auto p-4 h-full">
+            <h2 className="text-left text-2xl font-bold text-black-500">Create New Pin</h2>
+            {error && (
+                <div className="mt-2 p-2 bg-red-100 text-red-700 rounded">
+                    {error}
                 </div>
-
-                <div>
-                    <label className="block text-gray-800 font-medium mb-1">Location Name</label>
+            )}
+            <form className="mt-2 w-full flex-1 overflow-y-auto" onSubmit={handleSubmit}>
+                <div className="mb-4">
+                    <label className="block text-gray-700">Title</label>
                     <input
                         type="text"
-                        name="pinName"
-                        value={postData.pinName}
+                        name="title"
+                        value={postData.title}
                         onChange={handleChange}
-                        placeholder="Enter location name"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        placeholder="Enter pin title"
+                        required
                     />
                 </div>
 
-                <div>
-                    <label className="block text-gray-800 font-medium mb-1">Description</label>
-                    <input
-                        type="text"
-                        name="pinDescription"
-                        value={postData.pinDescription}
+                <div className="mb-4">
+                    <label className="block text-gray-700">Description</label>
+                    <textarea
+                        name="description"
+                        value={postData.description}
                         onChange={handleChange}
-                        placeholder="Enter description"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        placeholder="Enter pin description"
+                        rows="4"
+                        required
                     />
                 </div>
 
-                <div>
-                    <label className="block text-gray-800 font-medium mb-2">Visibility</label>
+                <div className="mb-4">
+                    <label className="block text-gray-700">Image</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="w-full text-gray-700"
+                    />
+                    {imagePreview && (
+                        <div className="mt-2">
+                            <img 
+                                src={imagePreview} 
+                                alt="Preview" 
+                                className="max-w-full h-48 object-cover rounded-lg"
+                            />
+                        </div>
+                    )}
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700">Visibility</label>
                     <div className="flex items-center space-x-6">
                         <label className="flex items-center space-x-2">
                             <input
@@ -174,22 +211,16 @@ const NewLocation = () => {
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-gray-800 font-medium mb-1">Upload Image</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="w-full text-gray-700"
-                    />
+                <div className="mb-4">
+                    <label className="block text-gray-700">Location</label>
+                    <div className="text-md font-bold text-gray-600">
+                        {cityCountry || `${lat}, ${lng}`}
+                    </div>
                 </div>
 
-                <button
-                    type="submit"
-                    className="w-full py-2 mt-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200"
-                >
-                    Create New Location
-                </button>
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Creating...' : 'Create Pin'}
+                </Button>
             </form>
         </div>
     );

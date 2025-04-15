@@ -55,14 +55,59 @@ const Map = () => {
   const navigate = useNavigate();
   const [pinnedLocations, setPinnedLocations] = useState([]);
   const [rightClickLocation, setRightClickLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:4000/query_map_pins?userId=3')
-      .then((response) => response.json())
-      .then((data) => {
-        setPinnedLocations(data);
+    const getUserLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setUserLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            });
+            setLoading(false);
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            setError('Unable to get your location. Please enable location services.');
+            setLoading(false);
+          }
+        );
+      } else {
+        setError('Geolocation is not supported by your browser');
+        setLoading(false);
+      }
+    };
+
+    getUserLocation();
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch('http://localhost:4000/query_map_pins', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       })
-      .catch((error) => console.error('Error fetching pins:', error));
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch pins');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const pins = Array.isArray(data) ? data : [];
+          setPinnedLocations(pins);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          setError('Failed to load pins. Please try again later.');
+        });
+    }
   }, []);
 
   const handleRightClick = (latlng) => {
@@ -84,18 +129,31 @@ const Map = () => {
     }
   };
 
-  if (pinnedLocations.length === 0) {
+  if (loading) {
     return <Loading />;
   }
 
-  const centerCoordinates = [
-    pinnedLocations[0].pinLocationLatitude,
-    pinnedLocations[0].pinLocationLongitude
-  ];
+  if (error) {
+    return (
+      <div className="h-[80vh] w-full flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const defaultCenter = userLocation || { lat: 0, lng: 0 };
 
   return (
     <MapContainer
-      center={centerCoordinates}
+      center={[defaultCenter.lat, defaultCenter.lng]}
       zoom={13}
       className="h-[80vh] w-full"
       attributionControl={true}
@@ -110,7 +168,7 @@ const Map = () => {
         onLeftClick={handleLeftClick}
       />
 
-      {pinnedLocations.map((pin, index) => (
+      {Array.isArray(pinnedLocations) && pinnedLocations.map((pin, index) => (
         <MapPin key={index} pinData={pin} />
       ))}
 
