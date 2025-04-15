@@ -19,7 +19,7 @@ describe('POST /create_pin', function () {
   it('should respond with 201 and pin data when valid fields + image are provided', async function () {
     const imagePath = path.join(__dirname, 'dummyimage.jpg');
 
-    const response = await request(app)
+    const res = await request(app)
       .post('/create')
       .field('title', 'Test Pin')
       .field('description', 'A test pin description')
@@ -27,21 +27,21 @@ describe('POST /create_pin', function () {
       .field('longitude', '-74.0060')
       .attach('image', imagePath);
 
-      assert.strictEqual(response.status, 201);
-      assert.strictEqual(response.body.message, 'Pin created successfully');
-      assert.ok(response.body.pin);
-      assert.strictEqual(response.body.pin.title, 'Test Pin');
+      assert.strictEqual(res.status, 201);
+      assert.strictEqual(res.body.message, 'Pin created successfully');
+      assert.ok(res.body.pin);
+      assert.strictEqual(res.body.pin.title, 'Test Pin');
   });
 
   it('should respond with 500 and error message if image file is missing', async function () {
-    const response = await request(app)
+    const res = await request(app)
       .post('/create')
       .field('title', 'Missing Image Pin')
       .field('description', 'This request has no image')
       .field('latitude', '40.7128')
       .field('longitude', '-74.0060');
 
-      assert.strictEqual(response.status, 500);
-      assert.ok(response.body.error);
+      assert.strictEqual(res.status, 500);
+      assert.ok(res.body.error);
   });
 });
