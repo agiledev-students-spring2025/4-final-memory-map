@@ -2,22 +2,38 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Button from "../components/Button";
 import Image from "../components/MockImage";
+import axios from 'axios';
 
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    const handleLogin = (event) => {
+    const handleLogin = async (event) => {
         event.preventDefault();
+        setError("");
 
         if (!username || !password) {
             alert("Please enter an username and password.");
             return;
         }
-        console.log("Login button clicked"); 
-        navigate("/landing");
-      };
+
+        try {
+            const response = await axios.post('http://localhost:4000/profile/login', {
+                username,
+                password
+            });
+
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+
+            navigate("/landing");
+        } catch (error) {
+            console.error('Login error:', error);
+            setError(error.response?.data?.error || "Login failed. Please try again.");
+        }
+    };
 
     return (
         <div className="h-screen flex justify-center bg-white">
@@ -27,6 +43,11 @@ const Login = () => {
                 </div>
                 
                 <h2 className="text-left text-2xl font-bold text-black-500">Login</h2>
+                {error && (
+                    <div className="mt-2 p-2 bg-red-100 text-red-700 rounded">
+                        {error}
+                    </div>
+                )}
                 <form className="mt-2" onSubmit={handleLogin}>
                     <div className="mb-4">
                         <label className="block text-gray-700">Username</label>
