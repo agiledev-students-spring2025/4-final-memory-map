@@ -9,25 +9,22 @@ dotenv.config();
 
 const router = express.Router();
 
-// const MOCKAROO_PINS_URL = `https://my.api.mockaroo.com/db_pins.json?key=${process.env.MOCKAROO_KEY}`;
-// const MOCKAROO_USERS_URL = `https://my.api.mockaroo.com/db_user.json?key=${process.env.MOCKAROO_KEY}`;
-
-
 router.get('/query_feed', authenticate, async (req, res) => {
-  // const { userId } = req.query;
-
-  // if (!userId) {
-  //   return res.status(400).json({ error: 'userId is required.' });
-  // }
-
   try {
-    // const responsePins = await axios.get(MOCKAROO_PINS_URL);
-    // const authorPins = await Pin.find({ author: req.user._id});
     const responsePins = await Pin.find();
-
-    // const responseUser = await axios.get(MOCKAROO_USERS_URL);
     const responseUser = await User.find();
-
+    // console.log(responsePins);
+    const transformedPins = responsePins.map(pin => ({
+      id: pin._id,
+      title: pin.title,
+      description: pin.description,
+      latitude: pin.location.coordinates[1],
+      longitude: pin.location.coordinates[0],
+      imageUrl: pin.imageUrl,
+      author: pin.author,
+      createdAt: pin.createdAt
+  }));
+    
     const allUser = responseUser.data ? responseUser.data : [];
     const allPins = responsePins.data ? responsePins.data : [];
 
@@ -37,7 +34,7 @@ router.get('/query_feed', authenticate, async (req, res) => {
     //either 1 which means the pin is public
     //or 3 the pin is private but the user is the owner of the pin
     //or 2 the pin is friends only and the user is in the friends list
-    const userPins = allPins
+    const userPins = transformedPins
       .filter(pin => {
         return pin.publicStatus === 1 ||
           (pin.publicStatus === 2 && friendsList.includes(pin.author)) ||
@@ -58,7 +55,8 @@ router.get('/query_feed', authenticate, async (req, res) => {
         
         return getOrder(a) - getOrder(b);
       });
-    res.json(userPins);
+      console.log(userPins.length);
+    res.json(transformedPins);
 
   } catch (error) {
     console.error('Error fetching data from Mockaroo:', error.message);

@@ -10,7 +10,6 @@ route.get('/query_friends', authenticate, async (req, res) => {
 
     try {
         const response = await User.find();
-        console.log(response.data);
         const allUsers = response.data ? response.data : [];
         const friends = allUsers.filter(user => {
             return user.allFriendsId.includes(Number(userId));

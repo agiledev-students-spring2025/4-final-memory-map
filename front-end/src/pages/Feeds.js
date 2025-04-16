@@ -24,13 +24,13 @@ const Feeds = () => {
                 const locations = Array.isArray(data) ? data : [];
                 setPinnedLocations(locations);
             })
-            .catch(error => {
-                console.error('Error fetching pinned location:', error);
+            .catch(hasError => {
+                console.error('Error fetching pinned location:', hasError);
                 setHasError('Unable to load pins');
             });
         }
     }, []);
-    
+
     const removeLocation = (pinId) => {
         setPinnedLocations(pinnedLocations.filter(location => location.pin_id !== pinId));
     };
