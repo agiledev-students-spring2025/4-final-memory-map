@@ -28,7 +28,11 @@ const LocationItem = ({ location, removeLocation }) => {
                 <div className="flex justify-between w-full py-3.5">
                     <div>
                         <div className="flex gap-3">
-                            <PinIcon />
+                            <img
+                                src={locationUser.profilePicture}
+                                alt={`${locationUser.firstName} ${locationUser.lastName}`}
+                                className="rounded-full mr-3"
+                            />
                             <span className="text-lg">{locationUser.firstName}</span>
                         </div>
                     </div>
