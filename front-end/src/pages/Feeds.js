@@ -4,32 +4,32 @@ import Loading from '../components/Loading';
 
 const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
-    const [hasError, setHasError] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            fetch('http://localhost:4000/query_feed', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
+          fetch('http://localhost:4000/query_feed', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch feed');
-                }
-                response.json()
+              if (!response.ok) {
+                throw new Error('Failed to fetch feed');
+              }
+              return response.json();
             })
             .then(data => {
-                const locations = Array.isArray(data) ? data : [];
-                setPinnedLocations(locations);
+              const pins = Array.isArray(data) ? data : [];
+              setPinnedLocations(pins);
             })
-            .catch(hasError => {
-                console.error('Error fetching pinned location:', hasError);
-                setHasError('Unable to load pins');
+            .catch(error => {
+              console.error('Error:', error);
+              setError('Failed to load feed. Please try again later.');
             });
         }
-    }, []);
+      }, []);
 
     const removeLocation = (pinId) => {
         setPinnedLocations(pinnedLocations.filter(location => location.pin_id !== pinId));

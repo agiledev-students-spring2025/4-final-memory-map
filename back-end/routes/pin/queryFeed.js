@@ -55,12 +55,10 @@ router.get('/query_feed', authenticate, async (req, res) => {
         
         return getOrder(a) - getOrder(b);
       });
-      console.log(userPins.length);
     res.json(transformedPins);
-
   } catch (error) {
-    console.error('Error fetching data from Mockaroo:', error.message);
-    res.status(500).json({ error: 'Failed to fetch pin data from Mockaroo.' });
+    console.error('Error fetching data from back end:', error.message);
+    res.status(500).json({ error: 'Failed to fetch pin data from back end.' });
   }
 });
 
