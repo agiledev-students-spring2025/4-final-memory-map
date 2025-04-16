@@ -4,16 +4,33 @@ import Loading from '../components/Loading';
 
 const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
+    const [hasError, setHasError] = useState(null);
+
     useEffect(() => {
-        fetch('http://localhost:4000/query_feed?userId=3', {
-            headers: {
-                'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
-            }
-        })
-        .then(response => response.json())
-        .then(data => setPinnedLocations(data))
-        .catch(error => console.error('Error fetching pinned location:', error));
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:4000/query_feed', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch feed');
+                }
+                response.json()
+            })
+            .then(data => {
+                const locations = Array.isArray(data) ? data : [];
+                setPinnedLocations(locations);
+            })
+            .catch(error => {
+                console.error('Error fetching pinned location:', error);
+                setHasError('Unable to load pins');
+            });
+        }
     }, []);
+    
     const removeLocation = (pinId) => {
         setPinnedLocations(pinnedLocations.filter(location => location.pin_id !== pinId));
     };
