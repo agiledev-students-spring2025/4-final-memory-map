@@ -4,6 +4,9 @@ import ExpandedLocationItem from "./ExpandedLocationItem";
 
 
 const LocationItem = ({ location, removeLocation }) => {
+
+    // TODO: make add friend route and improve friend searching
+
     // const [locationUser, setLocationUser] = useState(null);
     // const [hasError, setHasError] = useState(false);
 
