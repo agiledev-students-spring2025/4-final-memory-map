@@ -9,18 +9,43 @@ const Friends = () => {
     const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        fetch('http://localhost:4000/query_friends?userId=3', {
-            headers: {
-                'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
-            }
-        })
-        .then(response => response.json())
-        .then(data => setFriends(data))
-        .catch(error => {
-            console.error('Error fetching friends:', error);
-            setHasError(true);
-        });
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:4000/query_friends', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch friends');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const friends = Array.isArray(data) ? data : [];
+                setFriends(friends);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setHasError('Failed to load friends. Please try again later.');
+            });
+        }
     }, []);
+
+    // useEffect(() => {
+    //     fetch('http://localhost:4000/query_friends?userId=3', {
+    //         headers: {
+    //             'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
+    //         }
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => setFriends(data))
+    //     .catch(error => {
+    //         console.error('Error fetching friends:', error);
+    //         setHasError(true);
+    //     });
+    // }, []);
 
     useEffect(() => {
         const timer = setTimeout(() => {
