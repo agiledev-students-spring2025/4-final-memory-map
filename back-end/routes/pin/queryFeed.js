@@ -20,6 +20,7 @@ router.get('/query_feed', authenticate, async (req, res) => {
       description: pin.description,
       latitude: pin.location.coordinates[1],
       longitude: pin.location.coordinates[0],
+      locationName: pin.locationName,
       imageUrl: pin.imageUrl,
       author: pin.author,
       createdAt: pin.createdAt

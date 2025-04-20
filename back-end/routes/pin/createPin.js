@@ -5,6 +5,8 @@ import { authenticate } from '../auth.js';
 import { validatePin } from '../validators.js';
 import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const router = express.Router();
 
@@ -14,45 +16,83 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = 'uploads';
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir);
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
 const upload = multer({
-    storage: multer.memoryStorage(),
+    storage: storage,
     limits: {
         fileSize: 100 * 1024 * 1024 
     }
 });
 
-router.post('/create', authenticate, upload.single('image'), validatePin, async (req, res) => {
+router.post('/', authenticate, upload.single('image'), validatePin, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
+        console.log('Request body:', req.body);
+        console.log('Request file:', req.file ? req.file.filename : 'No file');
+        console.log('User ID:', req.user._id);
 
-        const { title, description, latitude, longitude, tags } = req.body;
+        const { title, description, latitude, longitude, visibility } = req.body;
+        let { locationName } = req.body;
         const userId = req.user._id;
 
-        if (!req.file) {
-            return res.status(400).json({ error: 'Image is required' });
+        console.log('Form fields:', {
+            title,
+            description,
+            latitude,
+            longitude,
+            visibility,
+            locationName,
+            userId
+        });
+
+        if (!title || !description || !latitude || !longitude || !visibility) {
+            return res.status(400).json({ 
+                error: 'Missing required fields',
+                details: { title, description, latitude, longitude, visibility }
+            });
         }
 
-        const result = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-                { 
-                    resource_type: 'auto',
+        if (!locationName || locationName.trim() === '') {
+            locationName = 'Unknown location';
+        }
+        
+        console.log('Location name to be saved:', locationName);
+
+        let imageUrl = null;
+        if (req.file) {
+            try {
+                const result = await cloudinary.uploader.upload(req.file.path, {
                     transformation: [
-                        { width: 1000, crop: "scale" },
-                        { quality: "auto" },
-                        { fetch_format: "auto" }
+                        { width: 800, height: 600, crop: 'fill' },
+                        { quality: 'auto' },
+                        { fetch_format: 'auto' }
                     ]
-                },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }
-            );
-            
-            stream.end(req.file.buffer);
-        });
+                });
+                imageUrl = result.secure_url;
+                
+                fs.unlink(req.file.path, (err) => {
+                    if (err) console.error('Error deleting file:', err);
+                });
+            } catch (uploadError) {
+                console.error('Cloudinary upload error:', uploadError);
+                return res.status(500).json({ 
+                    error: 'Failed to upload image',
+                    details: uploadError.message 
+                });
+            }
+        }
 
         const newPin = new Pin({
             title,
@@ -61,22 +101,21 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
                 type: 'Point',
                 coordinates: [parseFloat(longitude), parseFloat(latitude)]
             },
-            imageUrl: result.secure_url,
+            locationName: locationName,
+            imageUrl: imageUrl || 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg',
             author: userId,
-            tags: tags || []
+            tags: []
         });
 
         const savedPin = await newPin.save();
+        console.log('Pin saved successfully:', savedPin);
         
-        res.status(201).json({
-            message: 'Pin created successfully',
-            pin: savedPin
-        });
+        res.status(201).json(savedPin);
     } catch (error) {
         console.error('Error creating pin:', error);
-        res.status(500).json({
+        res.status(500).json({ 
             error: 'Failed to create pin',
-            details: error.message
+            details: error.message 
         });
     }
 });

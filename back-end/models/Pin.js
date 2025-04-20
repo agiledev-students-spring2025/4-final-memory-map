@@ -21,6 +21,11 @@ const pinSchema = new mongoose.Schema({
             required: true
         }
     },
+    locationName: {
+        type: String,
+        required: true,
+        trim: true
+    },
     imageUrl: {
         type: String,
         required: true
