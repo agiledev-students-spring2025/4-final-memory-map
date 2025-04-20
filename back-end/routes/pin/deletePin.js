@@ -1,38 +1,50 @@
 import express from 'express';
-import axios from 'axios';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import Pin from '../../models/Pin.js';
+import { authenticate } from '../auth.js';
+import { v2 as cloudinary } from 'cloudinary';
 
 const router = express.Router();
 
-const MOCKAROO_PINS_URL = `https://my.api.mockaroo.com/db_pins.json?key=${process.env.MOCKAROO_KEY}`;
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-router.delete('/delete_pin', async (req, res) => {
-  const { pinId } = req.body;
+router.delete('/delete', authenticate, async (req, res) => {
+    try {
+        const { pinId } = req.body;
 
-  console.log(`Received request to delete pin with ID: ${pinId}`);
+        if (!pinId) {
+            return res.status(400).json({ error: 'Pin ID is required' });
+        }
 
-  if (!pinId) {
-    return res.status(400).json({ error: 'pinId is required' });
-  }
+        const pin = await Pin.findById(pinId);
+        if (!pin) {
+            return res.status(404).json({ error: 'Pin not found' });
+        }
 
-  try {
-    const response = await axios.get(MOCKAROO_PINS_URL);
-    const allPins = response.data;
-    const pinExists = allPins.some(pin => pin.id === Number(pinId));
-    if (!pinExists) {
-      return res.status(404).json({ error: `Pin with ID ${pinId} not found` });
+        if (pin.author.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ error: 'Not authorized to delete this pin' });
+        }
+
+        if (pin.imageUrl) {
+            const publicId = pin.imageUrl.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(publicId);
+        }
+
+        await Pin.findByIdAndDelete(pinId);
+
+        res.status(200).json({
+            message: 'Pin deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting pin:', error);
+        res.status(500).json({
+            error: 'Failed to delete pin',
+            details: error.message
+        });
     }
-    return res.status(200).json({
-      message: `Pin with ID ${pinId} deleted successfully`,
-    });
-  } catch (error) {
-    console.error('Error fetching data from Mockaroo:', error.message);
-    return res.status(500).json({
-      error: 'Failed to delete pin from Mockaroo data',
-    });
-  }
 });
 
 export default router;

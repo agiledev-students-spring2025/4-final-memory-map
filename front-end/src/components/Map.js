@@ -14,7 +14,7 @@ import Loading from './Loading';
 
 const RightClickHandler = ({ onRightClick, onLeftClick }) => {
   useMapEvent({
-    contextmenu: (e) => {
+    dblclick: (e) => {
       onRightClick(e.latlng);
     },
     click: () => {
@@ -36,19 +36,43 @@ const AutoOpeningPopup = ({ position, onConfirm }) => {
 
   return (
     <Marker position={position}>
-      <Popup ref={popupRef}>
-        <div className="flex flex-col gap-2">
-          <p className="font-semibold">Create a new memory here?</p>
+      <Popup ref={popupRef} className="modern-popup">
+        <div className="flex flex-col items-center gap-2">
           <button
             onClick={onConfirm}
-            className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+            className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium 
+                     transition-all duration-200 hover:bg-gray-700 active:scale-95 
+                     flex items-center justify-center gap-2"
           >
-            Yes, create here
+            <span>Add memory</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+            </svg>
           </button>
         </div>
       </Popup>
     </Marker>
   );
+};
+
+const HintPopup = () => {
+  const [showHint, setShowHint] = useState(true);
+
+  return showHint ? (
+    <div className="absolute top-4 right-4 z-[1000] bg-gray-500 text-white px-3 py-1.5 rounded-md shadow-lg w-64">
+      <div className="flex items-center justify-between">
+        <p className="text-sm">
+          Double-click to add memory 📍
+        </p>
+        <button 
+          onClick={() => setShowHint(false)}
+          className="text-white/70 hover:text-white flex-shrink-0 text-sm ml-2 transition-colors duration-200"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  ) : null;
 };
 
 const Map = () => {
@@ -122,11 +146,16 @@ const Map = () => {
     if (rightClickLocation) {
       navigate('/new-location', {
         state: {
-          latitude: rightClickLocation.lat,
-          longitude: rightClickLocation.lng
+          lat: rightClickLocation.lat,
+          lng: rightClickLocation.lng,
+          fromMap: true
         }
       });
     }
+  };
+
+  const handleDeletePin = (deletedPinId) => {
+    setPinnedLocations(prevPins => prevPins.filter(pin => pin.id !== deletedPinId));
   };
 
   if (loading) {
@@ -152,33 +181,40 @@ const Map = () => {
   const defaultCenter = userLocation || { lat: 0, lng: 0 };
 
   return (
-    <MapContainer
-      center={[defaultCenter.lat, defaultCenter.lng]}
-      zoom={13}
-      className="h-[80vh] w-full"
-      attributionControl={true}
-    >
-      <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-        attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://carto.com/attributions">CARTO</a>'
-      />
+    <div className="h-[calc(100vh-4rem)] w-full relative">
+      <MapContainer
+        center={[defaultCenter.lat, defaultCenter.lng]}
+        zoom={13}
+        style={{ height: '100%', width: '100%' }}
+        className="z-0"
+        attributionControl={true}
+      >
+        <div className="absolute top-4 right-4 z-[1000]">
+          <HintPopup />
+        </div>
 
-      <RightClickHandler
-        onRightClick={handleRightClick}
-        onLeftClick={handleLeftClick}
-      />
-
-      {Array.isArray(pinnedLocations) && pinnedLocations.map((pin, index) => (
-        <MapPin key={index} pinData={pin} />
-      ))}
-
-      {rightClickLocation && (
-        <AutoOpeningPopup
-          position={rightClickLocation}
-          onConfirm={handleConfirmCreate}
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://carto.com/attributions">CARTO</a>'
         />
-      )}
-    </MapContainer>
+
+        <RightClickHandler
+          onRightClick={handleRightClick}
+          onLeftClick={handleLeftClick}
+        />
+
+        {Array.isArray(pinnedLocations) && pinnedLocations.map((pin, index) => (
+          <MapPin key={index} pinData={pin} onDelete={handleDeletePin} />
+        ))}
+
+        {rightClickLocation && (
+          <AutoOpeningPopup
+            position={rightClickLocation}
+            onConfirm={handleConfirmCreate}
+          />
+        )}
+      </MapContainer>
+    </div>
   );
 };
 
