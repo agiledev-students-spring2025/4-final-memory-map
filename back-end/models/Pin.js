@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const pinSchema = new mongoose.Schema({
     title: {
         type: String,
+        required: true,
         trim: true
     },
     description: {
@@ -12,19 +13,22 @@ const pinSchema = new mongoose.Schema({
     location: {
         type: {
             type: String,
-            default: 'Point'
+            enum: ['Point'],
+            required: true
         },
         coordinates: {
-            type: [Number]
+            type: [Number],
+            required: true
         }
     },
     imageUrl: {
         type: String,
-        default: ''
+        required: true
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     tags: [{
         type: String,

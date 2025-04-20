@@ -28,7 +28,7 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { title, description, latitude, longitude, tags, locationName } = req.body;
+        const { title, description, latitude, longitude, tags } = req.body;
         const userId = req.user._id;
 
         if (!req.file) {
@@ -61,7 +61,6 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
                 type: 'Point',
                 coordinates: [parseFloat(longitude), parseFloat(latitude)]
             },
-            locationName,
             imageUrl: result.secure_url,
             author: userId,
             tags: tags || []
