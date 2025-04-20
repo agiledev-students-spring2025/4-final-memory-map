@@ -1,41 +1,59 @@
 import express from 'express';
-import axios from 'axios';
-import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import User from '../../models/User.js';
+import { authenticate } from '../../routes/auth.js';
 
-dotenv.config();
-const route = express.Router();
-const MOCKAROO_URL = `https://my.api.mockaroo.com/db_user.json?key=${process.env.MOCKAROO_KEY}`;
+const router = express.Router();
 
-route.put('/update_user', async (req, res) => {
-  const { userId, firstName, lastName } = req.body;
-
-  if (!userId || !firstName || !lastName) {
-    return res.status(400).json({ error: 'userId, firstName, and lastName are required.' });
-  }
+// update the curr user's info
+router.put('/update_user', authenticate, async (req, res) => {
+  const { newUsername, newPassword, profilePicture } = req.body;
+  const userId = req.user._id; // pull from token
 
   try {
-    // fetch data from mockaroo
-    const response = await axios.get(MOCKAROO_URL);
-    const allUsers = response.data;
-    let user = allUsers.find(user => user.userId === Number(userId));
+    const updateFields = {}; // store only the fields the user wants to change
 
-    // check if user already exist
-    if (!user) {
-      return res.status(404).json({ error: 'User not found.' });
+    // if user wants to change username, make sure it's not already taken
+    if (newUsername) {
+      const existingUser = await User.findOne({ username: newUsername });
+
+      // dont allow duplicate username
+      if (existingUser && existingUser._id.toString() !== userId.toString()) {
+        return res.status(400).json({ error: 'Username already taken.' });
+      }
+
+      updateFields.username = newUsername;
+    }
+
+    // pfp update
+    if (profilePicture) {
+      updateFields.profilePicture = profilePicture;
+    }
+
+    // hash password before changing
+    if (newPassword) {
+      const salt = await bcrypt.genSalt(10);
+      updateFields.password = await bcrypt.hash(newPassword, salt);
     }
 
     // update user
-    user.firstName = firstName;
-    user.lastName = lastName;
-
-    res.json({
-      message: 'Profile updated successfully!',
-      updatedUser: user
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+      new: true, // return the updated doc
     });
-  } catch (error) {
-    console.error('Error fetching from Mockaroo:', error.message);
-    res.status(500).json({ error: 'Failed to update profile' });
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    // success
+    res.json({
+      message: 'User updated successfully!',
+      updatedUser,
+    });
+  } catch (err) {
+    console.error('Update error:', err.message);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
-export default route;
+export default router;

@@ -3,25 +3,33 @@ import EditPicIcon from '../components/icons/EditPicIcon';
 import ProfileNav from '../components/ProfileNav';
 
 const Profile = () => {
-  const [user, setUser] = useState({ firstName: "", lastName: "", username: "" });
-  const [CurrComponent, setCurrComponent] = useState(null);
+  const [user, setUser] = useState({ username: '' });
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showUpload, setShowUpload] = useState(false);
+  const [CurrComponent, setCurrComponent] = useState(null);
 
+  // Fetch user info with JWT
   useEffect(() => {
-    const userId = 3;
-    fetch(`http://localhost:4000/get_user?userId=${userId}`)
-      .then(response => response.json())
-      .then(data => {
-        setUser({
-          firstName: data.firstName || "First",
-          lastName: data.lastName || "Last",
-          username: data.userName || "unknown"
-        });
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+
+    fetch('http://localhost:4000/get_user', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUser({ username: data.username || 'unknown' });
         setProfileImageUrl(data.profilePicture);
       })
-      .catch(error => console.error("Error fetching user data:", error));
+      .catch((err) => {
+        console.error('Error fetching user:', err);
+      });
   }, []);
 
   useEffect(() => {
@@ -30,7 +38,7 @@ const Profile = () => {
         <ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={user} />
       );
     }
-  }, [user]); 
+  }, [user]);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -39,20 +47,28 @@ const Profile = () => {
   const handleUpload = async () => {
     if (!selectedFile) return;
 
-    const FD = new FormData();
-    FD.append('avatar', selectedFile);
-    FD.append('username', user.username);
+    const formData = new FormData();
+    formData.append('avatar', selectedFile);
 
-    const res = await fetch('http://localhost:4000/profile', {
-      method: 'POST',
-      body: FD
-    });
+    try {
+      const res = await fetch('http://localhost:4000/profile', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      setProfileImageUrl(`http://localhost:4000${data.fileUrl}`);
-      alert('Upload successful!');
-    } else {
+      const data = await res.json();
+
+      if (res.ok) {
+        setProfileImageUrl(`http://localhost:4000${data.fileUrl}`);
+        alert('Upload successful!');
+      } else {
+        alert('Upload failed.');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
       alert('Upload failed.');
     }
   };
@@ -85,12 +101,7 @@ const Profile = () => {
         </div>
       )}
 
-      <h1 className="font-bold mt-5 flex justify-center">
-        {user.firstName} {user.lastName}
-      </h1>
-      <p className="font-light flex text-xs justify-center">
-        @{user.username}
-      </p>
+      <p className="font-bold mt-5 flex justify-center">@{user.username}</p>
       {CurrComponent}
     </div>
   );
