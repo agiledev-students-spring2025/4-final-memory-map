@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import FriendItem from '../components/FriendItem';
 import FriendSearchBar from '../components/FriendSearchBar';
 import Loading from '../components/Loading';
+import PlusIcon from '../components/icons/PlusIcon';
+import { Link } from 'react-router-dom';
 
 const Friends = () => {
     const [friends, setFriends] = useState(null);
@@ -33,20 +35,6 @@ const Friends = () => {
         }
     }, []);
 
-    // useEffect(() => {
-    //     fetch('http://localhost:4000/query_friends?userId=3', {
-    //         headers: {
-    //             'X-API-Key': process.env.REACT_APP_MOCKAROO_KEY
-    //         }
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => setFriends(data))
-    //     .catch(error => {
-    //         console.error('Error fetching friends:', error);
-    //         setHasError(true);
-    //     });
-    // }, []);
-
     useEffect(() => {
         const timer = setTimeout(() => {
             if (friends === null) {
@@ -76,6 +64,11 @@ const Friends = () => {
     return (
         <div className="flex flex-col mx-auto h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            <Link to="/add-friend">
+                <PlusIcon>
+                    {"Add Friend"}
+                </PlusIcon>
+            </Link>
             <div className="text-xl font-bold p-3.5 pb-0">Social Circle</div>
             <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0">
                 {filteredFriends.length} {filteredFriends.length === 1 ? 'friend' : 'friends'}

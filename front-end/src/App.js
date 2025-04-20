@@ -10,6 +10,7 @@ import Feeds from './pages/Feeds';
 import Profile from './pages/Profile';
 import NoPage from './pages/NoPage';
 import NewLocation from './pages/NewLocation';
+import AddFriend from './pages/AddFriend';
 
 function App() {
   const location = useLocation();
@@ -32,6 +33,7 @@ function App() {
             <Route path="/feeds" element={<Feeds />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/new-location" element={<NewLocation />} />
+            <Route path="/add-friend" element={<AddFriend />} />
             <Route path="*" element={<NoPage />} />
           </Routes>
         </div>
