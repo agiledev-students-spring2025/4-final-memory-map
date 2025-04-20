@@ -2,7 +2,7 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../../models/User.js';
-import { authenticate } from '../../routes/authenticate.js';
+import { authenticate } from '../../routes/auth.js';
 
 const router = express.Router();
 
