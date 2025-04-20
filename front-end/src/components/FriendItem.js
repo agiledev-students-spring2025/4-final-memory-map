@@ -39,7 +39,7 @@ const FriendItem = ({ friend, removeFriend }) => {
                 <div className="flex items-center">
                     <img
                         src={friend.profilePicture}
-                        alt={`${friend.firstName} ${friend.lastName}`}
+                        alt={`${friend.username}`}
                         className="rounded-full mr-3"
                     />
                     <span className="text-lg">

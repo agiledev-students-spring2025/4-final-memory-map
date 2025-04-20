@@ -19,7 +19,7 @@ const AddFriend = () => {
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to fetch friends');
+                    throw new Error('Failed to fetch all users');
                 }
                 return response.json();
             })
@@ -31,8 +31,6 @@ const AddFriend = () => {
                 console.error('Error:', error);
                 setError('Failed to load friends. Please try again later.');
             });
-
-            console.log(allUsers);
         }
     }, []);
 
@@ -45,11 +43,10 @@ const AddFriend = () => {
         return () => clearTimeout(timer);
     }, [allUsers]);
 
-    // const filteredUsers = allUsers.filter(user => {
-    //     const fullName = `${user?.firstName || ''} ${user?.lastName || ''}`;
-    //     return fullName.toLowerCase().includes(searchTerm.toLowerCase());
-    // });
-    const filteredUsers = allUsers;
+    const filteredUsers = allUsers.filter(user => {
+        const username = `${user?.username || ''}`;
+        return username.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
     const removeFriend = (userId) => {
         setAllUsers(prevUsers => prevUsers.filter(user => user.userId !== userId));

@@ -11,8 +11,8 @@ route.get('/query_all_users', authenticate, async (req, res) => {
         const responseUsers = await User.find();
         console.log(responseUsers);
 
-        const allUsers = responseUsers.data ? responseUsers.data : [];
-        res.json(allUsers);
+        // const allUsers = responseUsers.data ? responseUsers.data : [];
+        res.json(responseUsers);
     } catch (error) {
         console.error('Error fetching data from backend:', error.message);
         res.status(500).json({ error: 'Failed to fetch all user data from backend'});
