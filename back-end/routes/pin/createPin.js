@@ -1,34 +1,23 @@
 import express from 'express';
-import multer from 'multer';
 import { validationResult } from 'express-validator';
 import Pin from '../../models/Pin.js';
 import { authenticate } from '../auth.js';
 import { validatePin } from '../validators.js';
+import { v2 as cloudinary } from 'cloudinary';
+import multer from 'multer';
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueName = `${Date.now()}-${file.originalname}`;
-        cb(null, uniqueName);
-    }
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const upload = multer({ 
-    storage,
+const upload = multer({
+    storage: multer.memoryStorage(),
     limits: {
-        fileSize: 5 * 1024 * 1024
-    },
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.'));
-        }
+        fileSize: 100 * 1024 * 1024 
     }
 });
 
@@ -39,8 +28,31 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { title, description, latitude, longitude, tags } = req.body;
+        const { title, description, latitude, longitude, tags, locationName } = req.body;
         const userId = req.user._id;
+
+        if (!req.file) {
+            return res.status(400).json({ error: 'Image is required' });
+        }
+
+        const result = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { 
+                    resource_type: 'auto',
+                    transformation: [
+                        { width: 1000, crop: "scale" },
+                        { quality: "auto" },
+                        { fetch_format: "auto" }
+                    ]
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            
+            stream.end(req.file.buffer);
+        });
 
         const newPin = new Pin({
             title,
@@ -49,7 +61,8 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
                 type: 'Point',
                 coordinates: [parseFloat(longitude), parseFloat(latitude)]
             },
-            imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
+            locationName,
+            imageUrl: result.secure_url,
             author: userId,
             tags: tags || []
         });

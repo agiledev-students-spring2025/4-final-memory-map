@@ -129,6 +129,10 @@ const Map = () => {
     }
   };
 
+  const handleDeletePin = (deletedPinId) => {
+    setPinnedLocations(prevPins => prevPins.filter(pin => pin.id !== deletedPinId));
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -169,7 +173,7 @@ const Map = () => {
       />
 
       {Array.isArray(pinnedLocations) && pinnedLocations.map((pin, index) => (
-        <MapPin key={index} pinData={pin} />
+        <MapPin key={index} pinData={pin} onDelete={handleDeletePin} />
       ))}
 
       {rightClickLocation && (
