@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Marker, Popup } from 'react-leaflet';
@@ -21,31 +21,13 @@ const MapPin = ({ pinData, onDelete }) => {
     title, 
     imageUrl, 
     description,
-    createdAt 
+    createdAt,
+    locationName
   } = pinData;
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [locationName, setLocationName] = useState('');
-
-  useEffect(() => {
-    const fetchLocationName = async () => {
-      try {
-        const response = await axios.get(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-        );
-        const address = response.data.address;
-        const name = address.road + ', ' + address.county || 'Unknown Location';
-        setLocationName(name);
-      } catch (error) {
-        console.error('Error fetching location name:', error);
-        setLocationName('Unknown Location');
-      }
-    };
-
-    fetchLocationName();
-  }, [latitude, longitude]);
 
   if (typeof latitude !== 'number' || typeof longitude !== 'number') return null;
 
