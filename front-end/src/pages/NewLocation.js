@@ -95,7 +95,7 @@ const NewLocation = () => {
 
             const token = localStorage.getItem('token');
             console.log('Form data being sent:', Object.fromEntries(formDataToSend));
-            const response = await axios.post('http://localhost:4000/', formDataToSend, {
+            const response = await axios.post('http://localhost:4000/create', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`

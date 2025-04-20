@@ -37,7 +37,7 @@ const upload = multer({
     }
 });
 
-router.post('/', authenticate, upload.single('image'), validatePin, async (req, res) => {
+router.post('/create', authenticate, upload.single('image'), validatePin, async (req, res) => {
     try {
         console.log('Request body:', req.body);
         console.log('Request file:', req.file ? req.file.filename : 'No file');
