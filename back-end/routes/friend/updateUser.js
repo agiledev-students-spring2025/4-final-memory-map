@@ -30,8 +30,11 @@ router.put('/update_user', authenticate, async (req, res) => {
       updateFields.profilePicture = profilePicture;
     }
 
-
-
+    // hash password before changing
+    if (newPassword) {
+      const salt = await bcrypt.genSalt(10);
+      updateFields.password = await bcrypt.hash(newPassword, salt);
+    }
 
     // update user
     const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
