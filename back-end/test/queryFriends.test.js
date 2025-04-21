@@ -1,33 +1,82 @@
-import { use, should, assert } from 'chai'
-import chaiHttp from 'chai-http';
-import app from '../app.js';
+import express from 'express';
+import request from 'supertest';
+import sinon from 'sinon';
+import { strict as assert } from 'assert';
+import route from '../routes/friend/queryFriends.js';
+import User from '../models/User.js';
+import * as authModule from '../routes/auth.js';
 
-const chai = use(chaiHttp);
-const { expect } = chai;
+describe('GET /query_friends (unit test)', function () {
+  let app;
+  let authStub;
 
-describe('GET request to /query_friends route', () => {
-    // TODO: when have backend add users to test database
+  beforeEach(function () {
+    app = express();
+    app.use(express.json());
 
-    it('should respond with HTTP 200 and an object in the response body', async function () {
-        chai.request(app)
-            .get('/query_friends?userId=3')
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                // expect(res.body.friends).to.have.lengthOf(5); // adjust as per actual response shape
-                expect(err).to.be.null
-                done();
-            });
+    authStub = sinon.stub(authModule, 'authenticate').callsFake((req, res, next) => {
+      req.user = { _id: 'fakeUserId' };
+      next();
     });
 
+    app.use('/', route);
+  });
 
+  afterEach(function () {
+    sinon.restore();
+  });
 
-    it('it should respond with an HTTP 400 status: no user id', async function () {
-        chai.request(app)
-            .get('/query_friends?user_id=')
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                done();
-            });
+  it('should return 200 and a list of friends', async function () {
+    const fakeFriends = [
+      { username: 'abby', email: 'abby@example.com', profilePicture: 'pic1.jpg' },
+      { username: 'chris', email: 'chris@example.com', profilePicture: 'pic2.jpg' }
+    ];
+
+    findByIdStub = sinon.stub(User, 'findById').returns({
+      populate: sinon.stub().resolves({
+        _id: 'fakeUserId',
+        username: 'testuser',
+        friends: fakeFriends
+      })
     });
 
+    const res = await request(app).get('/query_friends');
+
+    assert.equal(res.status, 200);
+    assert.ok(Array.isArray(res.body));
+    assert.equal(res.body.length, 2);
+    assert.deepEqual(res.body[0], fakeFriends[0]);
+    assert.deepEqual(res.body[1], fakeFriends[1]);
+  });
+
+  it('should return 404 if user is not found', async function () {
+    findByIdStub = sinon.stub(User, 'findById').returns({
+      populate: sinon.stub().resolves(null)
+    });
+
+    const res = await request(app).get('/query_friends');
+
+    assert.equal(res.status, 404);
+    assert.deepEqual(res.body, { error: 'User not found' });
+  });
+
+  it('should return 500 if DB throws an error', async function () {
+    findByIdStub = sinon.stub(User, 'findById').returns({
+      populate: sinon.stub().rejects(new Error('DB error'))
+    });
+
+    const res = await request(app).get('/query_friends');
+
+    assert.equal(res.status, 500);
+    assert.deepEqual(res.body, { error: 'Failed to fetch friend data' });
+  });
+
+  it('should return 401 if no token is provided', async function () {
+    authStub.restore();
+
+    const res = await request(app).get('/query_friends');
+
+    assert.equal(res.status, 401);
+    assert.deepEqual(res.body, { message: 'No token provided' });
+  });
 });
