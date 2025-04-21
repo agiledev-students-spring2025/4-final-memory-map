@@ -1,71 +1,72 @@
 import express from 'express';
+import request from 'supertest';
 import sinon from 'sinon';
-import axios from 'axios';
-import route from '../routes/friend/getUser.js';
-
-import {expect, use} from 'chai';
-import chaiHttp from "chai-http";
-// Attach chai‑http to chai
-const chai = use(chaiHttp);
+import { strict as assert } from 'assert';
+import route from '../routes/user/getUser.js';
+import User from '../models/User.js';
+import * as authModule from '../routes/auth.js';
 
 describe('GET /get_user', function () {
   let app;
-  let axiosGetStub;
+  let findByIdStub;
+  let authStub;
 
-  before(function () {
-    process.env.MOCKAROO_KEY = 'test-key';
+  beforeEach(function () {
     app = express();
     app.use(express.json());
+
+    authStub = sinon.stub(authModule, 'authenticate').callsFake((req, res, next) => {
+      req.user = { _id: 'fakeUserId' };
+      next();
+    });
+
     app.use('/', route);
   });
 
   afterEach(function () {
-    if (axiosGetStub) {
-      axiosGetStub.restore();
-    }
+    if (findByIdStub) findByIdStub.restore();
+    if (authStub) authStub.restore();
   });
 
-  it('should return 400 if userId is not present', async function () {
-    const res = await chai.request(app).get('/get_user');
-    expect(res).to.have.status(400);
-    expect(res.body).to.deep.equal({ error: 'userId is required.' });
+  it('should return 200 and user data when user exists', async function () {
+    const fakeUser = {
+      _id: '1',
+      username: 'testuser',
+      email: 'test@example.com',
+      profilePicture: 'https://example.com/profilePic.jpg',
+      friends: ['friend1', 'friend2']
+    };
+
+    findByIdStub = sinon.stub(User, 'findById').resolves(fakeUser);
+
+    const res = await request(app)
+      .get('/get_user')
+
+    assert.equal(res.status, 200);
+    assert.deepEqual(res.body, {
+      _id: fakeUser._id,
+      username: fakeUser.username,
+      email: fakeUser.email,
+      profilePicture: fakeUser.profilePicture,
+      friends: fakeUser.friends
+    });
   });
 
   it('should return 404 if user is not found', async function () {
-    const fakeUsers = [
-      { userId: 2, name: 'Person1' },
-      { userId: 3, name: 'Bob' }
-    ];
-    axiosGetStub = sinon.stub(axios, 'get').resolves({ data: fakeUsers });
+    findByIdStub = sinon.stub(User, 'findById').resolves(null);
 
-    const res = await chai.request(app)
-      .get('/get_user')
-      .query({ userId: '1' });
-    expect(res).to.have.status(404);
-    expect(res.body).to.deep.equal({ error: 'User not found.' });
+    const res = await request(app).get('/get_user');
+
+    assert.equal(res.status, 404);
+    assert.deepEqual(res.body, { error: 'User not found' });
   });
 
-  it('should return the user data if found', async function () {
-    const fakeUsers = [
-      { userId: 1, name: 'Person1' },
-      { userId: 2, name: 'Person2' }
-    ];
-    axiosGetStub = sinon.stub(axios, 'get').resolves({ data: fakeUsers });
+  it('should return 500 if findById throws an error', async function () {
+    findByIdStub = sinon.stub(User, 'findById').rejects(new Error('Database error'));
 
-    const res = await chai.request(app)
-      .get('/get_user')
-      .query({ userId: '1' });
-    expect(res).to.have.status(200);
-    expect(res.body).to.deep.equal({ userId: 1, name: 'Person1' });
-  });
+    const res = await request(app).get('/get_user');
 
-  it('should return 500 if error fetching data', async function () {
-    axiosGetStub = sinon.stub(axios, 'get').rejects(new Error('Network error'));
-
-    const res = await chai.request(app)
-      .get('/get_user')
-      .query({ userId: '1' });
-    expect(res).to.have.status(500);
-    expect(res.body).to.deep.equal({ error: 'Failed to fetch user data from Mockaroo' });
+    assert.equal(res.status, 500);
+    assert.deepEqual(res.body, { error: 'Failed to fetch user data' });
   });
 });
