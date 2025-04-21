@@ -1,13 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import Loading from '../components/Loading';
 import axios from 'axios';
-import PinIcon from "../components/icons/PinIcon";
 
 const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
-    const [error, setError] = useState(null);
+    const [, setError] = useState(null);
     const [userMap, setUserMap] = useState({});
-    const [taggedFriends, setTaggedFriends] = useState({});
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -27,12 +25,10 @@ const Feeds = () => {
               const pins = Array.isArray(data) ? data : [];
               setPinnedLocations(pins);
               
-              // Collect all user IDs (authors and tagged users)
               const userIds = new Set();
               pins.forEach(pin => {
                 if (pin.author) userIds.add(pin.author);
                 
-                // Add tagged friends if any
                 if (pin.tags && Array.isArray(pin.tags)) {
                   pin.tags.forEach(tagId => {
                     if (tagId) userIds.add(tagId);
@@ -69,15 +65,10 @@ const Feeds = () => {
         }
     };
 
-    const removeLocation = (pinId) => {
-        setPinnedLocations(pinnedLocations.filter(location => location.id !== pinId));
-    };
-
     if (pinnedLocations === null) {
         return <Loading />;
     }
 
-    // Helper function to format date
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', { 

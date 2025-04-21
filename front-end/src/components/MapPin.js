@@ -30,7 +30,7 @@ const MapPin = ({ pinData, onDelete }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [taggedFriends, setTaggedFriends] = useState([]);
-  const [isLoadingFriends, setIsLoadingFriends] = useState(false);
+  const [, setIsLoadingFriends] = useState(false);
 
   useEffect(() => {
     if (tags && tags.length > 0) {
