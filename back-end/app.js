@@ -33,6 +33,7 @@ import getUserRouter from './routes/friend/getUser.js';
 import deleteUserRouter from './routes/friend/deleteUser.js';
 import updatePinRouter from './routes/pin/updatePin.js';
 import queryAllUserRouter from './routes/friend/queryAllUsers.js';
+import addFriend from './routes/friend/addFriend.js';
 
 import createUserRouter from './routes/friend/createUser.js';
 /*
@@ -49,6 +50,7 @@ app.use(getUserRouter);
 app.use(deleteUserRouter);
 app.use(updatePinRouter);
 app.use(queryAllUserRouter);
+app.use(addFriend);
 
 
 app.use(createUserRouter);
