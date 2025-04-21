@@ -3,7 +3,7 @@ import EditPicIcon from '../components/icons/EditPicIcon';
 import ProfileNav from '../components/ProfileNav';
 
 const Profile = () => {
-  const [user, setUser] = useState({ username: '' });
+  const [user, setUser] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showUpload, setShowUpload] = useState(false);
@@ -26,16 +26,22 @@ const Profile = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setUser({ username: data.username || 'unknown', ...data });
-        setProfileImageUrl(data.profilePicture);
+        if (data && data.username) {
+          setUser({ username: data.username, ...data });
+          setProfileImageUrl(data.profilePicture);
+        } else {
+          console.error('User data is missing username:', data);
+          setUser({ username: 'Guest' });
+        }
       })
       .catch((err) => {
         console.error('Error fetching user:', err);
+        setUser({ username: 'Guest' });
       });
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user && user.username) {
       setCurrComponent(
         <ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={user} />
       );
@@ -95,6 +101,10 @@ const Profile = () => {
     setShowUpload(false);
     setUploadError('');
   };
+
+  if (!user) {
+    return <div className="py-6 px-4 text-center">Loading profile...</div>;
+  }
 
   return (
     <div className="py-6 px-4">
