@@ -1,12 +1,14 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import Pin from '../../models/Pin.js';
+import User from '../../models/User.js';
 import { authenticate } from '../auth.js';
 import { validatePin } from '../validators.js';
 import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -44,8 +46,39 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
         console.log('User ID:', req.user._id);
 
         const { title, description, latitude, longitude, visibility } = req.body;
-        let { locationName } = req.body;
+        let { locationName, tags } = req.body;
         const userId = req.user._id;
+
+        let parsedTags = [];
+        if (tags) {
+            try {
+                if (typeof tags === 'string') {
+                    parsedTags = JSON.parse(tags);
+                } else {
+                    parsedTags = tags;
+                }
+            } catch (err) {
+                console.error('Error parsing tags:', err);
+            }
+        }
+        
+        if (parsedTags.length > 0) {
+            const currentUser = await User.findById(userId);
+            if (!currentUser) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            
+            const userFriends = currentUser.friends.map(friend => friend.toString());
+            
+            const validFriendIds = [];
+            for (const friendId of parsedTags) {
+                if (mongoose.Types.ObjectId.isValid(friendId) && userFriends.includes(friendId)) {
+                    validFriendIds.push(friendId);
+                }
+            }
+            
+            parsedTags = validFriendIds;
+        }
 
         console.log('Form fields:', {
             title,
@@ -54,6 +87,7 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
             longitude,
             visibility,
             locationName,
+            tags: parsedTags,
             userId
         });
 
@@ -104,7 +138,8 @@ router.post('/create', authenticate, upload.single('image'), validatePin, async 
             locationName: locationName,
             imageUrl: imageUrl || 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg',
             author: userId,
-            tags: []
+            tags: parsedTags,
+            visibility: visibility
         });
 
         const savedPin = await newPin.save();

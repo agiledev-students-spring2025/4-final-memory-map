@@ -1,7 +1,7 @@
 import React from "react";
 import Settings from "./Settings";
 
-const Help = ({ setCurrComponent }) => {
+const Help = ({ setCurrComponent, user, setUser }) => {
     return (
         <div className="w-5/6 mx-auto bg-white p-6">
             <h2 className="text-xl font-semibold text-center mb-4">Settings</h2>
@@ -16,7 +16,7 @@ const Help = ({ setCurrComponent }) => {
 
             <div className="flex justify-center mt-6">
                 <button 
-                    onClick={() => setCurrComponent(<Settings setCurrComponent={setCurrComponent} />)}
+                    onClick={() => setCurrComponent(<Settings setCurrComponent={setCurrComponent} user={user} setUser={setUser} />)}
                     className="px-4 py-2 bg-gray-500 text-white hover:bg-blue-600 transition"
                 >
                     Back to Settings

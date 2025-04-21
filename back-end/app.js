@@ -5,7 +5,6 @@ import morgan from "morgan";
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-
 dotenv.config({ silent: true });
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -18,45 +17,47 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-import profileRoutes from './routes/friend/profile.js'; 
 app.use('/static', express.static('public'));
 app.use('/uploads', express.static('uploads'));
-app.use('/profile', profileRoutes);
+
+import profileRoutes from './routes/user/profile.js';
+import createUserRouter from './routes/user/createUser.js';
+import updateUserRouter from './routes/user/updateUser.js';
+import getUserRouter from './routes/user/getUser.js';
+import deleteUserRouter from './routes/user/deleteUser.js';
+import queryAllUserRouter from './routes/user/queryAllUsers.js';
+
+import deleteFriendRouter from './routes/friend/deleteFriend.js';
+import queryFriendsRouter from './routes/friend/queryFriends.js';
+import sendFriendRequestRouter from './routes/friend/sendFriendRequest.js';
+import acceptFriendRequestRouter from './routes/friend/acceptFriendRequest.js';
+import rejectFriendRequestRouter from './routes/friend/rejectFriendRequest.js';
+import getPendingRequestsRouter from './routes/friend/getPendingRequests.js';
 
 import createPinRouter from './routes/pin/createPin.js';
 import deletePinRouter from './routes/pin/deletePin.js';
 import queryFeedRouter from './routes/pin/queryFeed.js';
 import queryMapPinsRouter from './routes/pin/queryMapPins.js';
-import deleteFriendRouter from './routes/friend/deleteFriend.js';
-import getUserRouter from './routes/friend/getUser.js';
-import deleteUserRouter from './routes/friend/deleteUser.js';
 import updatePinRouter from './routes/pin/updatePin.js';
-import queryAllUserRouter from './routes/friend/queryAllUsers.js';
-import addFriend from './routes/friend/addFriend.js';
 
-import createUserRouter from './routes/friend/createUser.js';
-import updateUserRouter from './routes/friend/UpdateUser.js'
-import queryFriendsRouter from './routes/friend/queryFriends.js';
-
-app.use(queryMapPinsRouter);
-app.use(queryFeedRouter);
-app.use(deleteFriendRouter);
-app.use(createPinRouter);
-app.use(deletePinRouter);
-app.use(getUserRouter);
-app.use(deleteUserRouter);
-app.use(updatePinRouter);
-app.use(queryAllUserRouter);
-app.use(addFriend);
-
-
+app.use('/profile', profileRoutes);
 app.use(createUserRouter);
 app.use(updateUserRouter);
 app.use(getUserRouter);
+app.use(deleteUserRouter);
+app.use(queryAllUserRouter);
+
+app.use(deleteFriendRouter);
 app.use(queryFriendsRouter);
+app.use(sendFriendRequestRouter);
+app.use(acceptFriendRequestRouter);
+app.use(rejectFriendRequestRouter);
+app.use(getPendingRequestsRouter);
 
-
-
+app.use(createPinRouter);
+app.use(deletePinRouter);
+app.use(queryFeedRouter);
+app.use(queryMapPinsRouter);
+app.use(updatePinRouter);
 
 export default app;

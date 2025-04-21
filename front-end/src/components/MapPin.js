@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Marker, Popup } from 'react-leaflet';
@@ -22,12 +22,51 @@ const MapPin = ({ pinData, onDelete }) => {
     imageUrl, 
     description,
     createdAt,
-    locationName
+    locationName,
+    tags
   } = pinData;
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [taggedFriends, setTaggedFriends] = useState([]);
+  const [isLoadingFriends, setIsLoadingFriends] = useState(false);
+
+  useEffect(() => {
+    if (tags && tags.length > 0) {
+      const fetchTaggedFriends = async () => {
+        setIsLoadingFriends(true);
+        try {
+          const token = localStorage.getItem('token');
+          const friendsData = [];
+          
+          for (const tagId of tags) {
+            try {
+              const response = await axios.get(`http://localhost:4000/get_user/${tagId}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              
+              if (response.data) {
+                friendsData.push(response.data);
+              }
+            } catch (err) {
+              console.error(`Error fetching user with ID ${tagId}:`, err);
+            }
+          }
+          
+          setTaggedFriends(friendsData);
+        } catch (err) {
+          console.error('Error fetching tagged friends:', err);
+        } finally {
+          setIsLoadingFriends(false);
+        }
+      };
+      
+      fetchTaggedFriends();
+    }
+  }, [tags]);
 
   if (typeof latitude !== 'number' || typeof longitude !== 'number') return null;
 
@@ -115,6 +154,24 @@ const MapPin = ({ pinData, onDelete }) => {
                 </button>
               )}
             </div>
+
+            {taggedFriends.length > 0 && (
+              <div className="mb-3">
+                <p className="text-xs font-medium text-gray-700 mb-1">Tagged Friends:</p>
+                <div className="flex flex-wrap gap-2">
+                  {taggedFriends.map(friend => (
+                    <div key={friend._id} className="flex items-center bg-gray-100 rounded-full p-1 pr-3">
+                      <img 
+                        src={friend.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
+                        alt={friend.username} 
+                        className="w-5 h-5 rounded-full mr-1"
+                      />
+                      <span className="text-xs text-gray-700">{friend.username}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>{formatDate(createdAt)}</span>

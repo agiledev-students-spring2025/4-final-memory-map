@@ -16,6 +16,8 @@ router.get('/query_map_pins', authenticate, async (req, res) => {
             locationName: pin.locationName,
             imageUrl: pin.imageUrl,
             author: pin.author,
+            tags: pin.tags,
+            visibility: pin.visibility || '1',
             createdAt: pin.createdAt
         }));
 

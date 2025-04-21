@@ -1,6 +1,6 @@
 import React from 'react';
 
-const XIcon = ({ className = "w-5 h-5" }) => {
+const ClockIcon = ({ className = "w-5 h-5" }) => {
   return (
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
@@ -10,11 +10,11 @@ const XIcon = ({ className = "w-5 h-5" }) => {
     >
       <path 
         fillRule="evenodd" 
-        d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" 
+        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" 
         clipRule="evenodd" 
       />
     </svg>
   );
 };
 
-export default XIcon;
+export default ClockIcon; 

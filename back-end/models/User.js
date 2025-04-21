@@ -16,12 +16,22 @@ const userSchema = new mongoose.Schema({
     },
     profilePicture: {
         type: String,
-        default: ''
+        default: 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg' //default profile pic lol
     },
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    friendRequests: {
+        sent: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }],
+        received: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }]
+    },
     createdAt: {
         type: Date,
         default: Date.now

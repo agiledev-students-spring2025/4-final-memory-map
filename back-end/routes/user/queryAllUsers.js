@@ -8,7 +8,10 @@ const route = express.Router();
 
 route.get('/query_all_users', authenticate, async (req, res) => {
     try {
-        const responseUsers = await User.find();
+        const currentUserId = req.user._id;
+        
+        const responseUsers = await User.find({ _id: { $ne: currentUserId } });
+        
         res.json(responseUsers);
     } catch (error) {
         console.error('Error fetching data from backend:', error.message);

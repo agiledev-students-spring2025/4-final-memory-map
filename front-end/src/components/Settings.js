@@ -10,7 +10,7 @@ const Settings = ({ setCurrComponent, setUser, user }) => {
             return;
         }
     
-        setCurrComponent(<ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} />);
+        setCurrComponent(<ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={user} />);
     };
     
     return (
@@ -20,7 +20,7 @@ const Settings = ({ setCurrComponent, setUser, user }) => {
             <div className="space-y-4">
                 <label className="block">
                     <button 
-                        onClick={() => setCurrComponent(<Help setCurrComponent={setCurrComponent} setUser={setUser} />)}
+                        onClick={() => setCurrComponent(<Help setCurrComponent={setCurrComponent} setUser={setUser} user={user} />)}
                         className="p-4 border-b w-full text-gray-800 hover:bg-gray-100 transition text-left"
                     >
                         Help

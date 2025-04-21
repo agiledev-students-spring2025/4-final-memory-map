@@ -1,24 +1,27 @@
 import express from 'express';
 import User from '../../models/User.js';
-import dotenv from 'dotenv';
 import { authenticate } from '../auth.js';
 
-dotenv.config();
-const route = express.Router();
+const router = express.Router();
 
-route.get('/query_friends', authenticate, async (req, res) => {
-
+router.get('/query_friends', authenticate, async (req, res) => {
     try {
-        const response = await User.find();
-        const allUsers = response.data ? response.data : [];
-        const friends = allUsers.filter(user => {
-            return user.allFriendsId.includes(Number(userId));
-        });
+        const currentUser = await User.findById(req.user._id)
+            .populate('friends', 'username email profilePicture');
+        
+        if (!currentUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        const friends = currentUser.friends || [];
+        
+        console.log(`Found ${friends.length} friends for user ${currentUser.username}`);
+        
         res.json(friends);
     } catch (error) {
-        console.error('Error fetching data from backend:', error.message);
-        res.status(500).json({ error: 'Failed to fetch friend data from backend'});
+        console.error('Error fetching friends:', error.message);
+        res.status(500).json({ error: 'Failed to fetch friend data' });
     }
 });
 
-export default route;
+export default router;
