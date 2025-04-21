@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FriendSearchBar from '../components/FriendSearchBar';
 import Loading from '../components/Loading';
-import FriendItem from '../components/FriendItem';
+import AddFriendItem from '../components/AddFriendItem';
 
 const AddFriend = () => {
 
@@ -34,6 +34,7 @@ const AddFriend = () => {
         }
     }, []);
 
+    
     useEffect(() => {
         const timer = setTimeout(() => {
             if (allUsers === null) {
@@ -42,15 +43,11 @@ const AddFriend = () => {
         }, 10000);
         return () => clearTimeout(timer);
     }, [allUsers]);
-
+    
     const filteredUsers = allUsers.filter(user => {
         const username = `${user?.username || ''}`;
         return username.toLowerCase().includes(searchTerm.toLowerCase());
     });
-
-    const removeFriend = (userId) => {
-        setAllUsers(prevUsers => prevUsers.filter(user => user.userId !== userId));
-    };
     
     return (
         <div className="flex flex-col mx-auto h-full">
@@ -58,7 +55,7 @@ const AddFriend = () => {
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <div className="flex-1 overflow-y-auto">
                 {filteredUsers.map(user => (
-                    <FriendItem key={user.userId} friend={user} removeFriend={removeFriend} />
+                    <AddFriendItem key={user._id} user={user}/>
                 ))}
             </div>
         </div>

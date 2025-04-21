@@ -65,9 +65,14 @@ const Friends = () => {
         <div className="flex flex-col mx-auto h-full">
             <FriendSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <Link to="/add-friend">
-                <PlusIcon>
-                    {"Add Friend"}
-                </PlusIcon>
+                <div className="flex text-black-500 p-3.5">
+                    <div className="pr-3.5">
+                        Add Friend 
+                    </div>
+                    <PlusIcon>
+                        {"Add Friend"}
+                    </PlusIcon>
+                </div>
             </Link>
             <div className="text-xl font-bold p-3.5 pb-0">Social Circle</div>
             <div className="text-l text-gray-500 pl-3.5 pt-1 pb-0">
