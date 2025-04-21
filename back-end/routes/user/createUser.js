@@ -6,6 +6,7 @@ import { validateRegistration } from '../validators.js';
 
 const router = express.Router();
 
+
 router.post('/register', validateRegistration, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -23,7 +24,13 @@ router.post('/register', validateRegistration, async (req, res) => {
             });
         }
 
-        const user = new User({ username, email, password });
+        const user = new User({ 
+            username, 
+            email, 
+            password,
+            profilePicture: 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'
+        });
+        
         await user.save();
 
         const token = generateToken(user._id);

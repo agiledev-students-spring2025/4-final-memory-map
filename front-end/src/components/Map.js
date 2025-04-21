@@ -84,29 +84,25 @@ const Map = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getUserLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setUserLocation({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            });
-            setLoading(false);
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-            setError('Unable to get your location. Please enable location services.');
-            setLoading(false);
-          }
-        );
-      } else {
-        setError('Geolocation is not supported by your browser');
-        setLoading(false);
-      }
-    };
-
-    getUserLocation();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+          setLoading(false);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setError('Unable to get your location. Please enable location services.');
+          setLoading(false);
+        }
+      );
+    } else {
+      setError('Geolocation is not supported by your browser');
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -178,7 +174,7 @@ const Map = () => {
     );
   }
 
-  const defaultCenter = userLocation || { lat: 0, lng: 0 };
+  const defaultCenter = userLocation || { lat: 37.7749, lng: -122.4194 };
 
   return (
     <div className="h-[calc(100vh-4rem)] w-full relative">

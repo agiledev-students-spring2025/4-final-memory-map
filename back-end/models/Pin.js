@@ -36,9 +36,14 @@ const pinSchema = new mongoose.Schema({
         required: true
     },
     tags: [{
-        type: String,
-        trim: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }],
+    visibility: {
+        type: String,
+        enum: ['1', '2', '3'], // 1: public, 2: friends only, 3: private
+        default: '1'
+    },
     createdAt: {
         type: Date,
         default: Date.now
