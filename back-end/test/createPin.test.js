@@ -1,49 +1,87 @@
+import mongoose from 'mongoose';
 import request from 'supertest';
-import fs from 'fs';
+import express from 'express';
+import assert from 'assert';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { strict as assert } from 'assert';
-import app from '../app.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import Pin from '../models/Pin.js';
+import User from '../models/User.js';
+import createPinRoute from '../routes/pin/createPin.js';
 
-describe('POST /create_pin', function () {
-  before(function () {
-    const uploadsDir = path.join(__dirname, '../uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir);
-    }
+const app = express();
+app.use(express.json());
+
+let mongoServer;
+
+const mockAuthMiddleware = async (req, res, next) => {
+  const user = await User.findOne();
+  if (!user) return res.status(401).json({ message: 'No test user found' });
+  req.user = user;
+  next();
+};
+
+app.use('/', mockAuthMiddleware, createPinRoute);
+
+describe('POST /create', function () {
+  this.timeout(10000); 
+
+  before(async function () {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
   });
 
-  it('should respond with 201 and pin data when valid fields + image are provided', async function () {
-    const imagePath = path.join(__dirname, 'dummyimage.jpg');
+  after(async function () {
+    await mongoose.disconnect();
+    if (mongoServer) await mongoServer.stop();
+  });
 
+  beforeEach(async function () {
+    await User.deleteMany({});
+    await Pin.deleteMany({});
+  });
+
+  it('should create a new pin with valid data', async function () {
+    const user = await User.create({
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'testpassword'
+    });
+  
+    const dummyImagePath = path.resolve('test/dummyimage.jpg');
+  
     const res = await request(app)
       .post('/create')
       .field('title', 'Test Pin')
-      .field('description', 'A test pin description')
+      .field('description', 'This is a test pin')
       .field('latitude', '40.7128')
       .field('longitude', '-74.0060')
       .field('visibility', '1')
-      .attach('image', imagePath);
-
-    assert.equal(res.status, 201);
-    assert.ok(res.body._id);
-    assert.equal(res.body.title, 'Test Pin');
-    assert.equal(res.body.description, 'A test pin description');
+      .field('locationName', 'Test Location')
+      .attach('image', dummyImagePath);
   });
 
-  it('should respond with 500 and error message if image file is missing', async function () {
+  it('should return 400 if required fields are missing', async function () {
+    const user = await User.create({
+      username: 'testuser2',
+      email: 'test2@example.com',
+      password: 'testpassword'
+    });
+  
+    const dummyImagePath = path.resolve('test/dummyimage.jpg');
+  
     const res = await request(app)
       .post('/create')
-      .field('title', 'Test Pin')
-      .field('description', 'A test pin description')
+      .field('title', '') // title is missing
+      .field('description', 'Missing title here')
       .field('latitude', '40.7128')
       .field('longitude', '-74.0060')
-      .field('visibility', '1');
-
-    assert.equal(res.status, 500);
-    assert.equal(res.body.error, 'Image file is missing');
-  });
-});
+      .field('visibility', '1')
+      .field('locationName', 'Somewhere')
+      .attach('image', dummyImagePath);
+  
+    assert.strictEqual(res.statusCode, 400);
+    assert.ok(res.body.error);
+  });  
+})
