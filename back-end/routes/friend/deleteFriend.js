@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
-router.delete('/api/delete_friend', authenticate, async (req, res) => {
+router.delete('/delete_friend', authenticate, async (req, res) => {
   try {
     const { userId } = req.body;
     const currentUserId = req.user._id;

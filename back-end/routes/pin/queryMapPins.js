@@ -4,7 +4,7 @@ import { authenticate } from '../auth.js';
 
 const router = express.Router();
 
-router.get('/api/query_map_pins', authenticate, async (req, res) => {
+router.get('/query_map_pins', authenticate, async (req, res) => {
     try {
         const pins = await Pin.find({ author: req.user._id });
         const transformedPins = pins.map(pin => ({

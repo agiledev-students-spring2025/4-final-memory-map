@@ -4,7 +4,7 @@ import { authenticate } from '../auth.js';
 
 const router = express.Router();
 
-router.get('/api/query_friends', authenticate, async (req, res) => {
+router.get('/query_friends', authenticate, async (req, res) => {
     try {
         const currentUser = await User.findById(req.user._id)
             .populate('friends', 'username email profilePicture');
