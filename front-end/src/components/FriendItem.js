@@ -29,7 +29,7 @@ const FriendItem = ({ friend, removeFriend }) => {
             
             console.log(`Attempting to remove friend with ID: ${friend._id}`);
             
-            const response = await fetch('http://localhost:4000/delete_friend', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/delete_friend`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

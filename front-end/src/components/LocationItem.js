@@ -14,7 +14,7 @@ const LocationItem = ({ location, removeLocation }) => {
             setIsLoading(true);
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:4000/get_user/${location.author}`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_user/${location.author}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 

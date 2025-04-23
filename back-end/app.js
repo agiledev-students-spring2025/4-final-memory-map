@@ -10,11 +10,24 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost',
+];
+  
+const corsOptions = {
+origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+    callback(null, true);
+    } else {
+    callback(new Error('Not allowed by CORS: ' + origin));
+    }
+},
+credentials: true,
+};
+
 app.use(morgan('dev'));
-app.use(cors({ 
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/static', express.static('public'));
