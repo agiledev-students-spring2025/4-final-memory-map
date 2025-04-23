@@ -46,7 +46,7 @@ const upload = multer({
     }
 });
 
-router.post('/upload-profile-picture', authenticate, upload.single('profilePicture'), async (req, res) => {
+router.post('/api/upload-profile-picture', authenticate, upload.single('profilePicture'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
@@ -79,7 +79,7 @@ router.post('/upload-profile-picture', authenticate, upload.single('profilePictu
     }
 });
 
-router.post('/login', validateLogin, async (req, res) => {
+router.post('/api/login', validateLogin, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -116,7 +116,7 @@ router.post('/login', validateLogin, async (req, res) => {
     }
 });
 
-router.get('/profile', authenticate, async (req, res) => {
+router.get('/api/profile', authenticate, async (req, res) => {
     try {
         const user = await User.findById(req.user._id)
             .select('-password')
