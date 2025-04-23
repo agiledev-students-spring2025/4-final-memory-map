@@ -10,7 +10,7 @@ const Feeds = () => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-          fetch('http://localhost:4000/query_feed', {
+          fetch(`${process.env.REACT_APP_API_URL}/query_feed`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -50,7 +50,7 @@ const Feeds = () => {
             const userDetails = {};
             
             for (const userId of userIds) {
-                const response = await axios.get(`http://localhost:4000/get_user/${userId}`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_user/${userId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 

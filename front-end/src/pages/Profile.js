@@ -19,7 +19,7 @@ const Profile = () => {
       return;
     }
 
-    fetch('http://localhost:4000/get_user', {
+    fetch(`${process.env.REACT_APP_API_URL}/get_user`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -70,7 +70,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:4000/profile/upload-profile-picture', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/profile/upload-profile-picture`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -92,7 +92,7 @@ const AddFriendItem = ({ user, onFriendAdded }) => {
                 return;
             }
             
-            const response = await fetch('http://localhost:4000/send_request', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/send_request`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

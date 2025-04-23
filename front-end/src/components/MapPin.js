@@ -42,7 +42,7 @@ const MapPin = ({ pinData, onDelete }) => {
           
           for (const tagId of tags) {
             try {
-              const response = await axios.get(`http://localhost:4000/get_user/${tagId}`, {
+              const response = await axios.get(`${process.env.REACT_APP_API_URL}/get_user/${tagId}`, {
                 headers: {
                   'Authorization': `Bearer ${token}`
                 }
@@ -74,7 +74,7 @@ const MapPin = ({ pinData, onDelete }) => {
     setIsDeleting(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete('http://localhost:4000/delete', {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/delete`, {
         headers: {
           'Authorization': `Bearer ${token}`
         },

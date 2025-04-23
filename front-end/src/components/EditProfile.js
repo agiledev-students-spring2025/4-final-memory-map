@@ -27,7 +27,7 @@ const EditProfile = ({ setCurrComponent, user, setUser }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:4000/update_user", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/update_user`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

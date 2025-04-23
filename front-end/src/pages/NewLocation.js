@@ -54,7 +54,7 @@ const NewLocation = () => {
                 const token = localStorage.getItem('token');
                 if (!token) return;
 
-                const response = await axios.get('http://localhost:4000/query_friends', {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/query_friends`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -138,7 +138,7 @@ const NewLocation = () => {
 
             const token = localStorage.getItem('token');
             console.log('Form data being sent:', Object.fromEntries(formDataToSend));
-            const response = await axios.post('http://localhost:4000/create', formDataToSend, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/create`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`
