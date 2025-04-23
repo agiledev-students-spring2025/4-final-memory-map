@@ -7,7 +7,7 @@ import { validateRegistration } from '../validators.js';
 const router = express.Router();
 
 
-router.post('/api/register', validateRegistration, async (req, res) => {
+router.post('/register', validateRegistration, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

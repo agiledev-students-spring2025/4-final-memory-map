@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
-router.get('/api/pending_requests', authenticate, async (req, res) => {
+router.get('/pending_requests', authenticate, async (req, res) => {
   try {
     const currentUserId = req.user._id;
 

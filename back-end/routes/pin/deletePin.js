@@ -11,7 +11,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-router.delete('/api/delete', authenticate, async (req, res) => {
+router.delete('/delete', authenticate, async (req, res) => {
     try {
         const { pinId } = req.body;
 

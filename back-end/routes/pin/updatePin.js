@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.put('/api/update_pin', upload.single('image'), (req, res) => {
+router.put('/update_pin', upload.single('image'), (req, res) => {
   const { pinId, pinName, pinDescription, locationLatitude, locationLongitude } = req.body;
 
   if (!pinId) return res.status(400).json({ error: 'pinId is required.' });

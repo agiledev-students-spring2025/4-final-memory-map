@@ -44,7 +44,7 @@ const upload = multer({
   }
 });
 
-router.put('/api/update_user', authenticate, upload.single('profilePicture'), async (req, res) => {
+router.put('/update_user', authenticate, upload.single('profilePicture'), async (req, res) => {
   const { newUsername, newPassword } = req.body;
   const userId = req.user._id;
 

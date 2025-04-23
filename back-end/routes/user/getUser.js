@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
-router.get('/api/get_user', authenticate, async (req, res) => {
+router.get('/get_user', authenticate, async (req, res) => {
     try {
         const userId = req.user._id;
         
