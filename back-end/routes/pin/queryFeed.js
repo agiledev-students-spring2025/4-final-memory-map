@@ -9,7 +9,7 @@ dotenv.config();
 
 const router = express.Router();
 
-router.get('/query_feed', authenticate, async (req, res) => {
+router.get('/api/query_feed', authenticate, async (req, res) => {
   try {
     const userId = req.user._id;
     

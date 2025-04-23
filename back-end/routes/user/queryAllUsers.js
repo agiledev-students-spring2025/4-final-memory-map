@@ -6,7 +6,7 @@ import { authenticate } from '../auth.js';
 dotenv.config();
 const route = express.Router();
 
-route.get('/query_all_users', authenticate, async (req, res) => {
+route.get('/api/query_all_users', authenticate, async (req, res) => {
     try {
         const currentUserId = req.user._id;
         
