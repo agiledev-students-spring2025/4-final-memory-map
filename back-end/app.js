@@ -10,10 +10,12 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost',
-];
+const defaultOrigins = ['http://localhost', 'http://localhost:3000'];
+const allowedOriginFromEnv = process.env.ALLOWED_ORIGIN;
+
+const allowedOrigins = allowedOriginFromEnv
+  ? [...defaultOrigins, allowedOriginFromEnv]
+  : defaultOrigins;
   
 const corsOptions = {
 origin: function (origin, callback) {
