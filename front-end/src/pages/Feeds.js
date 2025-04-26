@@ -2,6 +2,12 @@ import React, {useEffect, useState} from 'react';
 import Loading from '../components/Loading';
 import axios from 'axios';
 
+const VISIBILITY = {
+    PRIVATE: '1',
+    FRIENDS: '2',
+    PUBLIC: '3'
+};
+
 const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
     const [, setError] = useState(null);
@@ -90,13 +96,13 @@ const Feeds = () => {
                         <div key={pin.id} className="mb-8">
                             <div className="flex items-center mb-3">
                                 <img 
-                                    src={userMap[pin.author]?.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                                    alt={userMap[pin.author]?.username || "User"} 
+                                    src={pin.authorPicture || userMap[pin.author]?.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
+                                    alt={pin.authorName || userMap[pin.author]?.username || "User"} 
                                     className="h-8 w-8 rounded-full object-cover mr-2"
                                 />
                                 <div className="flex-1">
                                     <div className="font-medium text-sm">
-                                        {userMap[pin.author]?.username || "User"}
+                                        {pin.authorName || userMap[pin.author]?.username || "User"}
                                         {pin.tags && pin.tags.length > 0 && (
                                             <span className="font-normal">
                                                 {pin.tags.map((tagId, index) => {
@@ -115,7 +121,7 @@ const Feeds = () => {
                                     </div>
                                     <p className="text-xs text-gray-500">{pin.locationName}</p>
                                 </div>
-                                <VisibilityBadge visibility={pin.visibility} />
+                                <VisibilityBadge visibility={pin.visibility} pinType={pin.pinType} />
                             </div>
                             
                             <img 
@@ -138,28 +144,43 @@ const Feeds = () => {
     );
 };
 
-const VisibilityBadge = ({ visibility }) => {
+const VisibilityBadge = ({ visibility, pinType }) => {
     const getVisibilityInfo = () => {
         switch(visibility) {
-            case '1':
+            case VISIBILITY.PRIVATE:
             case 1:
-                return { label: 'Public', bgColor: 'bg-green-100', textColor: 'text-green-800' };
-            case '2':
+                return { label: 'Private', bgColor: 'bg-gray-100', textColor: 'text-gray-800' };
+            case VISIBILITY.FRIENDS:
             case 2:
-                return { label: 'Friends', bgColor: 'bg-blue-100', textColor: 'text-blue-800' };
-            case '3':
+                return { label: 'Friends', bgColor: 'bg-indigo-100', textColor: 'text-indigo-800' };
+            case VISIBILITY.PUBLIC:
             case 3:
-                return { label: 'Private', bgColor: 'bg-red-100', textColor: 'text-red-800' };
+                return { label: 'Public', bgColor: 'bg-emerald-100', textColor: 'text-emerald-800' };
             default:
-                return { label: 'Public', bgColor: 'bg-green-100', textColor: 'text-green-800' };
+                return { label: 'Private', bgColor: 'bg-gray-100', textColor: 'text-gray-800' };
         }
     };
     
-    const visibilityInfo = getVisibilityInfo();
+    const getBadgeByType = () => {
+        if (!pinType) return getVisibilityInfo();
+        
+        switch(pinType) {
+            case 'own':
+                return { label: 'Your Memory', bgColor: 'bg-gray-100', textColor: 'text-gray-800' };
+            case 'friend':
+                return { label: 'Friend', bgColor: 'bg-indigo-100', textColor: 'text-indigo-800' };
+            case 'public':
+                return { label: 'Public', bgColor: 'bg-emerald-100', textColor: 'text-emerald-800' };
+            default:
+                return getVisibilityInfo();
+        }
+    };
+    
+    const badgeInfo = pinType ? getBadgeByType() : getVisibilityInfo();
     
     return (
-        <span className={`text-xs px-2 py-1 rounded-full ${visibilityInfo.bgColor} ${visibilityInfo.textColor}`}>
-            {visibilityInfo.label}
+        <span className={`text-xs px-2 py-1 rounded-full ${badgeInfo.bgColor} ${badgeInfo.textColor}`}>
+            {badgeInfo.label}
         </span>
     );
 };
