@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Loading from '../components/Loading';
 import axios from 'axios';
+import FeedFilters from '../components/FeedFilters';
 
 const VISIBILITY = {
     PRIVATE: '1',
@@ -10,8 +11,10 @@ const VISIBILITY = {
 
 const Feeds = () => {
     const [pinnedLocations, setPinnedLocations] = useState(null);
+    const [filteredPins, setFilteredPins] = useState([]);
     const [, setError] = useState(null);
     const [userMap, setUserMap] = useState({});
+    const [activeFilters, setActiveFilters] = useState(['own', 'friend', 'public']);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -51,6 +54,41 @@ const Feeds = () => {
         }
     }, []);
     
+    useEffect(() => {
+        if (pinnedLocations) {
+            const processed = pinnedLocations.map(pin => {
+                if (pin.pinType) return pin;
+                
+                let pinType;
+                if (pin.isOwnPin) {
+                    pinType = 'own';
+                } else if (pin.visibility === VISIBILITY.PUBLIC) {
+                    pinType = 'public';
+                } else {
+                    pinType = 'friend';
+                }
+                
+                return {
+                    ...pin,
+                    pinType
+                };
+            });
+            
+            const filtered = processed.filter(pin => activeFilters.includes(pin.pinType));
+            setFilteredPins(filtered);
+        }
+    }, [pinnedLocations, activeFilters]);
+    
+    const handleToggleFilter = (filterType) => {
+        setActiveFilters(prev => {
+            if (prev.includes(filterType)) {
+                return prev.filter(type => type !== filterType);
+            } else {
+                return [...prev, filterType];
+            }
+        });
+    };
+    
     const fetchUserDetails = async (userIds, token) => {
         try {
             const userDetails = {};
@@ -86,59 +124,66 @@ const Feeds = () => {
 
     return (
         <div className="flex flex-col mx-auto p-3 h-full">
-            <div className="flex-1 overflow-y-auto w-full max-w-md mx-auto">
-                {pinnedLocations.length === 0 ? (
-                    <div className="text-center text-gray-500 py-10">
-                        No pins in your feed yet. Create a pin or connect with friends!
-                    </div>
-                ) : (
-                    pinnedLocations.map((pin) => (
-                        <div key={pin.id} className="mb-8">
-                            <div className="flex items-center mb-3">
-                                <img 
-                                    src={pin.authorPicture || userMap[pin.author]?.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                                    alt={pin.authorName || userMap[pin.author]?.username || "User"} 
-                                    className="h-8 w-8 rounded-full object-cover mr-2"
-                                />
-                                <div className="flex-1">
-                                    <div className="font-medium text-sm">
-                                        {pin.authorName || userMap[pin.author]?.username || "User"}
-                                        {pin.tags && pin.tags.length > 0 && (
-                                            <span className="font-normal">
-                                                {pin.tags.map((tagId, index) => {
-                                                    const taggedUser = userMap[tagId];
-                                                    if (!taggedUser) return null;
-                                                    
-                                                    return (
-                                                        <span key={tagId}>
-                                                            {index === 0 ? ' & ' : ', '}
-                                                            {taggedUser.username}
-                                                        </span>
-                                                    );
-                                                })}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-xs text-gray-500">{pin.locationName}</p>
-                                </div>
-                                <VisibilityBadge visibility={pin.visibility} pinType={pin.pinType} />
-                            </div>
-                            
-                            <img 
-                                src={pin.imageUrl} 
-                                alt={pin.title} 
-                                className="w-full max-h-96 object-cover mb-3"
-                            />
-                            
-                            <div className="mb-2">
-                                <h3 className="font-bold text-lg">{pin.title}</h3>
-                                <p className="text-xs text-gray-500">{formatDate(pin.createdAt)}</p>
-                            </div>
-                            
-                            <ExpandableDescription description={pin.description} />
+            <div className="w-full max-w-md mx-auto h-full flex flex-col">
+                <FeedFilters 
+                    activeFilters={activeFilters}
+                    handleToggleFilter={handleToggleFilter}
+                />
+                
+                <div className="flex-1 overflow-y-auto">
+                    {filteredPins.length === 0 ? (
+                        <div className="text-center text-gray-500 py-10">
+                            No pins match your current filters. Try adjusting your filters or add more memories!
                         </div>
-                    ))
-                )}
+                    ) : (
+                        filteredPins.map((pin) => (
+                            <div key={pin.id} className="mb-8">
+                                <div className="flex items-center mb-3">
+                                    <img 
+                                        src={pin.authorPicture || userMap[pin.author]?.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
+                                        alt={pin.authorName || userMap[pin.author]?.username || "User"} 
+                                        className="h-8 w-8 rounded-full object-cover mr-2"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="font-medium text-sm">
+                                            {pin.authorName || userMap[pin.author]?.username || "User"}
+                                            {pin.tags && pin.tags.length > 0 && (
+                                                <span className="font-normal">
+                                                    {pin.tags.map((tagId, index) => {
+                                                        const taggedUser = userMap[tagId];
+                                                        if (!taggedUser) return null;
+                                                        
+                                                        return (
+                                                            <span key={tagId}>
+                                                                {index === 0 ? ' & ' : ', '}
+                                                                {taggedUser.username}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-gray-500">{pin.locationName}</p>
+                                    </div>
+                                    <VisibilityBadge visibility={pin.visibility} pinType={pin.pinType} />
+                                </div>
+                                
+                                <img 
+                                    src={pin.imageUrl} 
+                                    alt={pin.title} 
+                                    className="w-full max-h-96 object-cover mb-3"
+                                />
+                                
+                                <div className="mb-2">
+                                    <h3 className="font-bold text-lg">{pin.title}</h3>
+                                    <p className="text-xs text-gray-500">{formatDate(pin.createdAt)}</p>
+                                </div>
+                                
+                                <ExpandableDescription description={pin.description} />
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
         </div>
     );

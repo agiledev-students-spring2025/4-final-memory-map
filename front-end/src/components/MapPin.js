@@ -10,6 +10,7 @@ const createPinIconUrl = (color) => {
 
 const pinIcons = {
   own: L.icon({
+    iconUrl: createPinIconUrl('%23111827'),
     iconSize: [30, 30],
     iconAnchor: [15, 30],
     popupAnchor: [0, -30]
