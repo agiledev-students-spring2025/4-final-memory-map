@@ -20,36 +20,55 @@ router.get('/query_feed', authenticate, async (req, res) => {
     
     const userFriends = currentUser.friends || [];
     
-    const pins = await Pin.find().sort({ createdAt: -1 });
+    const pins = await Pin.find().sort({ createdAt: -1 }).populate('author', 'username profilePicture');
     
+    // 1 = Private 
+    // 2 = Friends 
+    // 3 = Public 
     const transformedPins = pins
       .filter(pin => {
-        if (pin.author.toString() === userId.toString()) {
+        if (pin.author._id.toString() === userId.toString()) {
           return true;
         }
         
-        if (pin.visibility === '1' || pin.visibility === 1) {
+        if (pin.visibility === '3' || pin.visibility === 3) {
           return true;
-        } else if ((pin.visibility === '2' || pin.visibility === 2) && 
-                  userFriends.some(friendId => friendId.toString() === pin.author.toString())) {
+        } 
+        
+        if ((pin.visibility === '2' || pin.visibility === 2) && 
+                userFriends.some(friendId => friendId.toString() === pin.author._id.toString())) {
           return true;
         }
         
         return false;
       })
-      .map(pin => ({
-        id: pin._id,
-        title: pin.title,
-        description: pin.description,
-        latitude: pin.location.coordinates[1],
-        longitude: pin.location.coordinates[0],
-        locationName: pin.locationName,
-        imageUrl: pin.imageUrl,
-        author: pin.author,
-        tags: pin.tags,
-        visibility: pin.visibility || '1',
-        createdAt: pin.createdAt
-      }));
+      .map(pin => {
+        let pinType;
+        if (pin.author._id.toString() === userId.toString()) {
+          pinType = 'own';
+        } else if (pin.visibility === '3' || pin.visibility === 3) {
+          pinType = 'public';
+        } else {
+          pinType = 'friend';
+        }
+        
+        return {
+          id: pin._id,
+          title: pin.title,
+          description: pin.description,
+          latitude: pin.location.coordinates[1],
+          longitude: pin.location.coordinates[0],
+          locationName: pin.locationName,
+          imageUrl: pin.imageUrl,
+          author: pin.author._id,
+          authorName: pin.author.username,
+          authorPicture: pin.author.profilePicture,
+          pinType: pinType,
+          tags: pin.tags,
+          visibility: pin.visibility || '1',
+          createdAt: pin.createdAt
+        };
+      });
     
     res.json(transformedPins);
   } catch (error) {
