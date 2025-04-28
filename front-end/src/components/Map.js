@@ -144,13 +144,6 @@ const Map = () => {
     setPinnedLocations(prevPins => prevPins.filter(pin => pin.id !== deletedPinId));
   };
 
-  // TODO: create this function
-  const handleUpdatePin = (updatedPinId) => {
-    navigate('/update-location', {
-
-    })
-  };
-
   const handleLocationSearch = (location) => {
     setSearchedLocation(location);
   };
@@ -206,7 +199,7 @@ const Map = () => {
         />
 
         {Array.isArray(filteredPins) && filteredPins.map((pin, index) => (
-          <MapPin key={index} pinData={pin} onDelete={handleDeletePin} onUpdate={handleUpdatePin}/>
+          <MapPin key={index} pinData={pin} onDelete={handleDeletePin}/>
         ))}
 
         {rightClickLocation && (
