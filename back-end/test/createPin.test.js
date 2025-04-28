@@ -24,12 +24,13 @@ cloudinary.v2.uploader.upload = async () => {
 const app = express();
 app.use(express.json());
 
-let mongoServer;
+app.use('/', authenticate, createPinRoute); 
 
-app.use('/', authenticate, createPinRoute);
+let mongoServer;
+let token;
 
 describe('POST /create', function () {
-  this.timeout(10000); 
+  this.timeout(10000);
 
   before(async function () {
     mongoServer = await MongoMemoryServer.create();
@@ -56,14 +57,8 @@ describe('POST /create', function () {
   });
 
   it('should create a new pin with valid data', async function () {
-    const user = await User.create({
-      username: 'testuser',
-      email: 'test@example.com',
-      password: 'testpassword'
-    });
-  
     const dummyImagePath = path.resolve('test/dummyimage.jpg');
-  
+
     const res = await request(app)
       .post('/create')
       .set('Authorization', `Bearer ${token}`)
@@ -74,29 +69,26 @@ describe('POST /create', function () {
       .field('visibility', '1')
       .field('locationName', 'Test Location')
       .attach('image', dummyImagePath);
+
+    assert.strictEqual(res.statusCode, 201);
+    assert.ok(res.body._id);
   });
 
   it('should return 400 if required fields are missing', async function () {
-    const user = await User.create({
-      username: 'testuser2',
-      email: 'test2@example.com',
-      password: 'testpassword'
-    });
-  
     const dummyImagePath = path.resolve('test/dummyimage.jpg');
-  
+
     const res = await request(app)
       .post('/create')
       .set('Authorization', `Bearer ${token}`)
-      .field('title', '') // title is missing
+      .field('title', '') // missing title
       .field('description', 'Missing title here')
       .field('latitude', '40.7128')
       .field('longitude', '-74.0060')
       .field('visibility', '1')
       .field('locationName', 'Somewhere')
       .attach('image', dummyImagePath);
-  
+
     assert.strictEqual(res.statusCode, 400);
     assert.ok(res.body.error);
-  });  
-})
+  });
+});
