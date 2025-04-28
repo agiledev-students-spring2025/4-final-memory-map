@@ -14,6 +14,10 @@ import User from '../models/User.js';
 import deletePinRoute from '../routes/pin/deletePin.js';
 import { authenticate } from '../routes/auth.js';
 
+cloudinary.v2.uploader.destroy = async () => {
+  return { result: 'ok' };
+};
+
 const app = express();
 app.use(express.json());
 
@@ -60,8 +64,8 @@ describe('DELETE /delete_pin', function () {
       userId: user._id,
       author: user._id, 
     
-      imageUrl: 'http://example.com/fake-image.jpg',
-      cloudinaryPublicId: 'fake_public_id',
+      imageUrl: 'http://example.com/dummy-image.jpg',
+      cloudinaryPublicId: 'dummy_public_id',
     
       location: {
         type: 'Point',
