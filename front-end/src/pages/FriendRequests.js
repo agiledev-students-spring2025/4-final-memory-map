@@ -25,7 +25,7 @@ const FriendRequests = () => {
                 return;
             }
             
-            const response = await fetch('http://localhost:4000/pending_requests', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/pending_requests`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -56,7 +56,7 @@ const FriendRequests = () => {
                 return;
             }
             
-            const response = await fetch('http://localhost:4000/accept_request', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/accept_request`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const FriendRequests = () => {
                 return;
             }
             
-            const response = await fetch('http://localhost:4000/reject_request', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/reject_request`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

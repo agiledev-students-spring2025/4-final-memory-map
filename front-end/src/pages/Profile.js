@@ -3,7 +3,7 @@ import EditPicIcon from '../components/icons/EditPicIcon';
 import ProfileNav from '../components/ProfileNav';
 
 const Profile = () => {
-  const [user, setUser] = useState({ username: '' });
+  const [user, setUser] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showUpload, setShowUpload] = useState(false);
@@ -19,23 +19,29 @@ const Profile = () => {
       return;
     }
 
-    fetch('http://localhost:4000/get_user', {
+    fetch(`${process.env.REACT_APP_API_URL}/get_user`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        setUser({ username: data.username || 'unknown', ...data });
-        setProfileImageUrl(data.profilePicture);
+        if (data && data.username) {
+          setUser({ username: data.username, ...data });
+          setProfileImageUrl(data.profilePicture);
+        } else {
+          console.error('User data is missing username:', data);
+          setUser({ username: 'Guest' });
+        }
       })
       .catch((err) => {
         console.error('Error fetching user:', err);
+        setUser({ username: 'Guest' });
       });
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user && user.username) {
       setCurrComponent(
         <ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={user} />
       );
@@ -64,7 +70,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:4000/profile/upload-profile-picture', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/profile/upload-profile-picture`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,6 +101,10 @@ const Profile = () => {
     setShowUpload(false);
     setUploadError('');
   };
+
+  if (!user) {
+    return <div className="py-6 px-4 text-center">Loading profile...</div>;
+  }
 
   return (
     <div className="py-6 px-4">
