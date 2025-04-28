@@ -35,7 +35,7 @@ const visibilityMap = {
   '3': 'Public'
 };
 
-const MapPin = ({ pinData, onDelete }) => {
+const MapPin = ({ pinData, onDelete, onUpdate }) => {
   const { 
     id,
     latitude, 
@@ -54,6 +54,8 @@ const MapPin = ({ pinData, onDelete }) => {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showUpdateConfirm, setShowUpdateConfirm] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [taggedFriends, setTaggedFriends] = useState([]);
   const [, setIsLoadingFriends] = useState(false);
@@ -120,6 +122,29 @@ const MapPin = ({ pinData, onDelete }) => {
       setShowDeleteConfirm(false);
     }
   };
+
+  const handleUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${process.env.REACT_APP_API_URL}/update`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        data: { }
+      });
+
+      if (onUpdate) {
+        onUpdate(id);
+      }
+    } catch (error) {
+      console.error('Error updating pin:', error);
+      alert('Failed to update pin. Please try again.');
+    } finally {
+      setIsUpdating(false);
+      setShowUpdateConfirm(false);
+    }
+  }
 
   const formatDate = (date) => {
     return new Date(date).toLocaleString('en-US', {
