@@ -1,3 +1,6 @@
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
+
+import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import express from 'express';
@@ -8,20 +11,14 @@ import path from 'path';
 import Pin from '../models/Pin.js';
 import User from '../models/User.js';
 import createPinRoute from '../routes/pin/createPin.js';
+import { authenticate } from '../routes/auth.js';
 
 const app = express();
 app.use(express.json());
 
 let mongoServer;
 
-const mockAuthMiddleware = async (req, res, next) => {
-  const user = await User.findOne();
-  if (!user) return res.status(401).json({ message: 'No test user found' });
-  req.user = user;
-  next();
-};
-
-app.use('/', mockAuthMiddleware, createPinRoute);
+app.use('/', authenticate, createPinRoute);
 
 describe('POST /create', function () {
   this.timeout(10000); 
@@ -40,6 +37,14 @@ describe('POST /create', function () {
   beforeEach(async function () {
     await User.deleteMany({});
     await Pin.deleteMany({});
+
+    const user = await User.create({
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'testpassword'
+    });
+
+    token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
   });
 
   it('should create a new pin with valid data', async function () {
@@ -53,6 +58,7 @@ describe('POST /create', function () {
   
     const res = await request(app)
       .post('/create')
+      .set('Authorization', `Bearer ${token}`)
       .field('title', 'Test Pin')
       .field('description', 'This is a test pin')
       .field('latitude', '40.7128')
@@ -73,6 +79,7 @@ describe('POST /create', function () {
   
     const res = await request(app)
       .post('/create')
+      .set('Authorization', `Bearer ${token}`)
       .field('title', '') // title is missing
       .field('description', 'Missing title here')
       .field('latitude', '40.7128')
