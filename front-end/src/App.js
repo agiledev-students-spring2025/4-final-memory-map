@@ -12,6 +12,7 @@ import NoPage from './pages/NoPage';
 import NewLocation from './pages/NewLocation';
 import AddFriend from './pages/AddFriend';
 import FriendRequests from './pages/FriendRequests';
+import UserProfile from './pages/UserProfile';
 
 function App() {
   const location = useLocation();
@@ -36,6 +37,7 @@ function App() {
             <Route path="/new-location" element={<NewLocation />} />
             <Route path="/add-friend" element={<AddFriend />} />
             <Route path="/friend-requests" element={<FriendRequests />} />
+            <Route path="/user-profile" element={<UserProfile />} />
             <Route path="*" element={<NoPage />} />
           </Routes>
         </div>
