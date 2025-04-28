@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "mocha": "^11.1.0",
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^7.1.0"
+  }
+}
