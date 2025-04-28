@@ -7,11 +7,19 @@ import express from 'express';
 import assert from 'assert';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import path from 'path';
+import cloudinary from 'cloudinary';
 
 import Pin from '../models/Pin.js';
 import User from '../models/User.js';
 import createPinRoute from '../routes/pin/createPin.js';
 import { authenticate } from '../routes/auth.js';
+
+cloudinary.v2.uploader.upload = async () => {
+  return {
+    secure_url: 'http://example.com/dummy-image.jpg',
+    public_id: 'dummy_public_id'
+  };
+};
 
 const app = express();
 app.use(express.json());
