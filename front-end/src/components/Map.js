@@ -10,6 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import MapPin from './MapPin';
 import Loading from './Loading';
+import DateFilter from './DateFilter';
 
 import HintPopup from './map/HintPopup';
 import MapControls from './map/MapControls';
@@ -187,7 +188,6 @@ const Map = () => {
         <LocationControl userLocation={userLocation} />
         <InitialMapSetup center={[mapCenter.lat, mapCenter.lng]} />
         <LocationSetter searchedLocation={searchedLocation} />
-
         <TileLayer
           url={currentMapTheme.url}
           attribution={currentMapTheme.attribution}
