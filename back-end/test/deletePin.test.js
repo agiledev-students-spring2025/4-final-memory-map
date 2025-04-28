@@ -75,28 +75,33 @@ describe('DELETE /delete_pin', function () {
   });
 
   it('should return 400 if pinId is not provided', async function () {
-    const res = await request (app)
+    const res = await request(app)
       .delete('/delete')
+      .set('Authorization', `Bearer ${token}`)
       .send({});
-
+  
     assert.strictEqual(res.status, 400);
-    assert.strictEqual(res.body.error, 'pinId is required');
-  });
+    assert.strictEqual(res.body.error, 'Pin ID is required');
+  });  
 
-  it('should return 500 if pin does not exist in database', async function () {
-    const res = await request (app)
+  it('should return 404 if pin does not exist in database', async function () {
+    const fakeId = new mongoose.Types.ObjectId();
+    const res = await request(app)
       .delete('/delete')
-      .send({ pinId: 999999 });
+      .set('Authorization', `Bearer ${token}`)
+      .send({ pinId: fakeId });
+  
+    assert.strictEqual(res.status, 404);
+    assert.strictEqual(res.body.error, 'Pin not found');
+  });  
 
-    assert.strictEqual(res.status, 500);
-    assert.strictEqual(res.body.error, 'Failed to delete pin from database');
-  });
-
-  it('should return 200 if pin is found and "deleted"', async function () {
-    const res = await request (app)
+  it('should return 200 if pin is found and deleted', async function () {
+    const res = await request(app)
       .delete('/delete')
-      .send({ pinId: 1 });
+      .set('Authorization', `Bearer ${token}`)
+      .send({ pinId: createdPin._id.toString() });
 
     assert.strictEqual(res.status, 200);
-  })
+    assert.strictEqual(res.body.message, 'Pin deleted successfully');
+  });
 });
