@@ -25,7 +25,7 @@ const AddFriend = () => {
                 return;
             }
             
-            const response = await fetch('http://localhost:4000/query_all_users', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/query_all_users`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

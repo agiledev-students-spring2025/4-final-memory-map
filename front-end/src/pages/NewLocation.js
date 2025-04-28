@@ -3,18 +3,30 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Button from "../components/Button";
 import axios from 'axios';
 
+const VISIBILITY = {
+    PRIVATE: '1',
+    FRIENDS: '2',
+    PUBLIC: '3'
+};
+
+const VISIBILITY_LABELS = {
+    [VISIBILITY.PRIVATE]: "Private (Only You)",
+    [VISIBILITY.FRIENDS]: "Friends Only",
+    [VISIBILITY.PUBLIC]: "Public (Everyone)"
+};
+
 const NewLocation = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { lat, lng } = location.state || {};
+    const { lat, lng, defaultVisibility } = location.state || {};
     const fromMap = location.state?.fromMap ?? false;
 
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         image: null,
-        visibility: '1' // 1: public, 2: friends only, 3: private
+        visibility: defaultVisibility || VISIBILITY.PRIVATE // Default to private
     });
     const [imagePreview, setImagePreview] = useState(null);
     const [missingLocation, setMissingLocation] = useState(false);
@@ -54,7 +66,7 @@ const NewLocation = () => {
                 const token = localStorage.getItem('token');
                 if (!token) return;
 
-                const response = await axios.get('http://localhost:4000/query_friends', {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/query_friends`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -130,15 +142,12 @@ const NewLocation = () => {
                 formDataToSend.append('tags', JSON.stringify(selectedFriends));
             }
             
-            console.log('Sending location name:', locationName);
-            
             if (formData.image) {
                 formDataToSend.append('image', formData.image);
             }
 
             const token = localStorage.getItem('token');
-            console.log('Form data being sent:', Object.fromEntries(formDataToSend));
-            const response = await axios.post('http://localhost:4000/create', formDataToSend, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/create`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`
@@ -249,189 +258,156 @@ const NewLocation = () => {
     }
 
     return (
-        <div className="w-full absolute inset-0 overflow-y-auto bg-white">
-            <div className="max-w-md mx-auto p-4 pb-20">
-                <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                    <p className="text-sm text-gray-600">Location:</p>
-                    <p className="text-sm font-medium text-gray-900">{locationName}</p>
+        <div className="flex flex-col mx-auto p-3 h-full max-w-xl overflow-auto pb-20">
+            <div className="text-xl font-bold p-3.5">New Memory</div>
+            
+            <div className="mb-4">
+                <div className="flex gap-2 items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-600">{locationName}</span>
                 </div>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        placeholder="Add a title"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                </div>
+                
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        placeholder="Add a description"
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                </div>
+                
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                    <div className="flex items-center justify-center w-full">
+                        <label className="w-full flex flex-col items-center px-4 py-6 bg-white text-gray-500 rounded-lg shadow-lg tracking-wide border border-gray-300 cursor-pointer hover:bg-gray-50 transition-colors">
+                            {imagePreview ? (
+                                <div className="relative w-full">
+                                    <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, image: null }));
+                                            setImagePreview(null);
+                                        }}
+                                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span className="mt-2 text-sm">Select an image</span>
+                                </>
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                    <select
+                        name="visibility"
+                        value={formData.visibility}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                        <option value={VISIBILITY.PRIVATE}>{VISIBILITY_LABELS[VISIBILITY.PRIVATE]}</option>
+                        <option value={VISIBILITY.FRIENDS}>{VISIBILITY_LABELS[VISIBILITY.FRIENDS]}</option>
+                        <option value={VISIBILITY.PUBLIC}>{VISIBILITY_LABELS[VISIBILITY.PUBLIC]}</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <button
+                        type="button"
+                        onClick={() => setShowTagFriendsPopup(true)}
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                        </svg>
+                        Tag Friends {selectedFriends.length > 0 && `(${selectedFriends.length})`}
+                    </button>
+                    
+                    {selectedFriends.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                            {selectedFriends.map(friendId => {
+                                const friend = friends.find(f => f._id === friendId);
+                                if (!friend) return null;
+                                
+                                return (
+                                    <span key={friendId} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                        {friend.username}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleFriendSelect(friendId)}
+                                            className="ml-1 text-indigo-500 hover:text-indigo-700 focus:outline-none"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+                
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <span className="block sm:inline">{error}</span>
+                    <div className="p-2 text-sm text-red-600 bg-red-50 rounded">
+                        {error}
                     </div>
                 )}
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                            Title
-                        </label>
-                        <input
-                            type="text"
-                            name="title"
-                            id="title"
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            value={formData.title}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                            Description
-                        </label>
-                        <textarea
-                            name="description"
-                            id="description"
-                            rows="3"
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            value={formData.description}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
-                        <div className="flex space-x-4">
-                            <label className="inline-flex items-center">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="1"
-                                    checked={formData.visibility === '1'}
-                                    onChange={handleInputChange}
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Public</span>
-                            </label>
-                            <label className="inline-flex items-center">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="2"
-                                    checked={formData.visibility === '2'}
-                                    onChange={handleInputChange}
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Friends Only</span>
-                            </label>
-                            <label className="inline-flex items-center">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="3"
-                                    checked={formData.visibility === '3'}
-                                    onChange={handleInputChange}
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Private</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    {/* Tag Friends Button */}
-                    <div className="mb-4">
-                        <button
-                            type="button"
-                            onClick={() => setShowTagFriendsPopup(true)}
-                            className="flex items-center justify-center w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                            </svg>
-                            Tag Friends {selectedFriends.length > 0 ? `(${selectedFriends.length})` : ''}
-                        </button>
-                        
-                        {/* Display selected friends below the button */}
-                        {selectedFriends.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {friends
-                                    .filter(friend => selectedFriends.includes(friend._id))
-                                    .map(friend => (
-                                        <div key={friend._id} className="flex items-center bg-indigo-100 rounded-full p-1 pr-3">
-                                            <img 
-                                                src={friend.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                                                alt={friend.username} 
-                                                className="w-5 h-5 rounded-full mr-1"
-                                            />
-                                            <span className="text-xs text-gray-700">{friend.username}</span>
-                                        </div>
-                                    ))}
-                            </div>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Image
-                        </label>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                            <div className="space-y-1 text-center">
-                                {imagePreview ? (
-                                    <div className="mb-4">
-                                        <img src={imagePreview} alt="Preview" className="mx-auto h-32 w-auto" />
-                                    </div>
-                                ) : (
-                                    <svg
-                                        className="mx-auto h-12 w-12 text-gray-400"
-                                        stroke="currentColor"
-                                        fill="none"
-                                        viewBox="0 0 48 48"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                            strokeWidth={2}
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                )}
-                                <div className="flex text-sm text-gray-600">
-                                    <label
-                                        htmlFor="image"
-                                        className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                                    >
-                                        <span>Upload a file</span>
-                                        <input
-                                            id="image"
-                                            name="image"
-                                            type="file"
-                                            className="sr-only"
-                                            onChange={handleImageChange}
-                                            accept="image/*"
-                                            required
-                                        />
-                                    </label>
-                                    <p className="pl-1">or drag and drop</p>
-                                </div>
-                                <p className="text-xs text-gray-500">PNG, JPG, GIF up to 100MB</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end space-x-4 pb-4 mt-6">
-                        <button
-                            type="button"
-                            onClick={() => navigate('/landing')}
-                            className="bg-gray-200 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className={`${
-                                isLoading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
-                            } py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-                        >
-                            {isLoading ? 'Creating...' : 'Create Pin'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
+                
+                <div className="flex justify-between">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/landing')}
+                        className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    >
+                        {isLoading ? 'Saving...' : 'Save Memory'}
+                    </button>
+                </div>
+            </form>
+            
             {showTagFriendsPopup && <TagFriendsPopup />}
         </div>
     );
