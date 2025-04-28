@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Marker, Popup } from 'react-leaflet';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const createPinIconUrl = (color) => {
   return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="${color}" class="size-6"> <path fill-rule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd" /> </svg>`;
@@ -51,6 +52,8 @@ const MapPin = ({ pinData, onDelete, onUpdate }) => {
     authorName,
     authorPicture
   } = pinData;
+
+  const navigate = useNavigate();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -123,27 +126,28 @@ const MapPin = ({ pinData, onDelete, onUpdate }) => {
     }
   };
 
-  const handleUpdate = async () => {
-    setIsUpdating(true);
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(`${process.env.REACT_APP_API_URL}/update`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        data: { }
-      });
+  const handleUpdatePin = () => {
+    navigate('/update-location');
+    // setIsUpdating(true);
+    // try {
+    //   const token = localStorage.getItem('token');
+    //   await axios.post(`${process.env.REACT_APP_API_URL}/update`, {
+    //     headers: {
+    //       'Authorization': `Bearer ${token}`
+    //     },
+    //     data: { }
+    //   });
 
-      if (onUpdate) {
-        onUpdate(id);
-      }
-    } catch (error) {
-      console.error('Error updating pin:', error);
-      alert('Failed to update pin. Please try again.');
-    } finally {
-      setIsUpdating(false);
-      setShowUpdateConfirm(false);
-    }
+    //   if (onUpdate) {
+    //     onUpdate(id);
+    //   }
+    // } catch (error) {
+    //   console.error('Error updating pin:', error);
+    //   alert('Failed to update pin. Please try again.');
+    // } finally {
+    //   setIsUpdating(false);
+    //   setShowUpdateConfirm(false);
+    // }
   }
 
   const formatDate = (date) => {
@@ -196,7 +200,9 @@ const MapPin = ({ pinData, onDelete, onUpdate }) => {
                     disabled={isUpdating}
                     className="text-green-800 hover:text-green-900 transition-colors duration-200"
                   >
-                    
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                      <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z" clip-rule="evenodd" />
+                    </svg>
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
@@ -299,6 +305,27 @@ const MapPin = ({ pinData, onDelete, onUpdate }) => {
                 </button>
               </div>
             </div>
+          )}
+
+          {showUpdateConfirm && (
+            <div className="absolute inset-0 bg-gray-800 bg-opacity-90 p-4 flex flex-col justify-center items-center transition-opacity duration-300">
+            <p className="text-center mb-4 text-white">Are you sure you want to update this pin?</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowUpdateConfirm(false)}
+                className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdatePin}
+                disabled={isUpdating}
+                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200 disabled:bg-red-300"
+              >
+                {isUpdating ? 'Updating...' : 'Update'}
+              </button>
+            </div>
+          </div>
           )}
         </div>
       </Popup>
