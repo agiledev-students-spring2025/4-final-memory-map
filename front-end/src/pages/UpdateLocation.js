@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
-import Button from "../components/Button";
+import { useNavigate, useLocation } from 'react-router-dom';
+// import Button from "../components/Button";
 import axios from 'axios';
 
 const VISIBILITY = {
@@ -15,57 +15,36 @@ const VISIBILITY_LABELS = {
     [VISIBILITY.PUBLIC]: "Public (Everyone)"
 };
 
-const UpdateLocation = (locationData) => {
+const UpdateLocation = () => {
+    const location = useLocation();
+    const thisLocationData = location.state;
     let { 
+        id,
         title, 
         imageUrl, 
         description,
         tags,
         visibility,
-      } = locationData;
+      } = thisLocationData;
 
-    // const location = useLocation();
     const navigate = useNavigate();
 
-    // const { lat, lng, defaultVisibility } = location.state || {};
-    // const fromMap = location.state?.fromMap ?? false;
 
     const [formData, setFormData] = useState({
         title: title,
         description: description,
-        image: null,
-        visibility: visibility
+        image: imageUrl,
+        visibility: visibility,
+        pinId: id
     });
+
     const [imagePreview, setImagePreview] = useState(null);
-    // const [missingLocation, setMissingLocation] = useState(false);
-    // const [locationName, setLocationName] = useState('Loading location...');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [friends, setFriends] = useState([]);
     const [isLoadingFriends, setIsLoadingFriends] = useState(false);
     const [selectedFriends, setSelectedFriends] = useState([]);
     const [showTagFriendsPopup, setShowTagFriendsPopup] = useState(false);
-
-    // useEffect(() => {
-    //     if (!lat || !lng) {
-    //         setMissingLocation(true);
-    //         navigate('/');
-    //     } else {
-    //         fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
-    //             .then(res => res.json())
-    //             .then(data => {
-    //                 const street = data.address.road || '';
-    //                 const city = data.address.city || data.address.town || data.address.village || '';
-    //                 const country = data.address.country || '';
-    //                 const name = `${street}${street && city ? ', ' : ''}${city}${city && country ? ', ' : ''}${country}`;
-    //                 setLocationName(name || 'Unknown location');
-    //             })
-    //             .catch(err => {
-    //                 console.error("Geocoding error:", err);
-    //                 setLocationName('Unknown location');
-    //             });
-    //     }
-    // }, [lat, lng, navigate]);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -139,23 +118,25 @@ const UpdateLocation = (locationData) => {
 
         try {
             const formDataToSend = new FormData();
-            formDataToSend.append('title', formData.title);
-            formDataToSend.append('description', formData.description);
-            // formDataToSend.append('latitude', lat);
-            // formDataToSend.append('longitude', lng);
-            formDataToSend.append('visibility', formData.visibility);
-            // formDataToSend.append('locationName', locationName);
-            
+            formData.append('pinId', formData.pinId);
+            if (formData.title) {
+                formDataToSend.append('title', formData.title);
+            }
+            if (formData.description) {
+                formDataToSend.append('description', formData.description);
+            }
+            if (formData.visibility) {
+                formDataToSend.append('visibility', formData.visibility);
+            }
             if (selectedFriends.length > 0) {
                 formDataToSend.append('tags', JSON.stringify(selectedFriends));
             }
-            
             if (formData.image) {
                 formDataToSend.append('image', formData.image);
             }
 
             const token = localStorage.getItem('token');
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/create`, formDataToSend, {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/update_pin`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`
@@ -167,7 +148,7 @@ const UpdateLocation = (locationData) => {
                 navigate('/landing');
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to create pin');
+            setError(err.response?.data?.error || 'Failed to update pin');
         } finally {
             setIsLoading(false);
         }
@@ -250,31 +231,15 @@ const UpdateLocation = (locationData) => {
         );
     };
 
-    // if (missingLocation && !fromMap) {
-    //     return (
-    //         <div className="flex flex-col mx-auto p-3 h-full items-center max-w-xl">
-    //             <div className="text-xl font-bold p-3.5">New Location</div>
-    //             <div className="text-red-600 font-semibold mb-4 text-center">
-    //                 Please go back and right-click a spot on the map to choose a location first.
-    //             </div>
-    //             <div className="text-sm text-gray-600 mb-4 text-center">
-    //                 This form is only enabled after selecting a location on the map by <strong>right-clicking</strong>.
-    //             </div>
-    //             <Button onClick={() => navigate('/landing')}>Go to Map</Button>
-    //         </div>
-    //     );
-    // }
-
     return (
         <div className="flex flex-col mx-auto p-3 h-full max-w-xl overflow-auto pb-20">
-            <div className="text-xl font-bold p-3.5">New Memory</div>
+            <div className="text-xl font-bold p-3.5">Update Memory</div>
             
             <div className="mb-4">
                 <div className="flex gap-2 items-center mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                     </svg>
-                    {/* <span className="text-sm text-gray-600">{locationName}</span> */}
                 </div>
             </div>
             
@@ -286,7 +251,6 @@ const UpdateLocation = (locationData) => {
                         name="title"
                         value={formData.title}
                         onChange={handleInputChange}
-                        placeholder="Add a title"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     />
                 </div>
@@ -297,7 +261,6 @@ const UpdateLocation = (locationData) => {
                         name="description"
                         value={formData.description}
                         onChange={handleInputChange}
-                        placeholder="Add a description"
                         rows={4}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     />
@@ -411,7 +374,7 @@ const UpdateLocation = (locationData) => {
                         disabled={isLoading}
                         className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
-                        {isLoading ? 'Saving...' : 'Save Memory'}
+                        {isLoading ? 'Saving...' : 'Update Memory'}
                     </button>
                 </div>
             </form>
