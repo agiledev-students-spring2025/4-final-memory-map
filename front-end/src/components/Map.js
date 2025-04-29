@@ -199,7 +199,7 @@ const Map = () => {
         />
 
         {Array.isArray(filteredPins) && filteredPins.map((pin, index) => (
-          <MapPin key={index} pinData={pin} onDelete={handleDeletePin} />
+          <MapPin key={index} pinData={pin} onDelete={handleDeletePin}/>
         ))}
 
         {rightClickLocation && (
