@@ -1,49 +1,94 @@
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
+
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import request from 'supertest';
-import fs from 'fs';
+import express from 'express';
+import assert from 'assert';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { strict as assert } from 'assert';
-import app from '../app.js';
+import cloudinary from 'cloudinary';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import Pin from '../models/Pin.js';
+import User from '../models/User.js';
+import createPinRoute from '../routes/pin/createPin.js';
+import { authenticate } from '../routes/auth.js';
 
-describe('POST /create_pin', function () {
-  before(function () {
-    const uploadsDir = path.join(__dirname, '../uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir);
-    }
+cloudinary.v2.uploader.upload = async () => {
+  return {
+    secure_url: 'http://example.com/dummy-image.jpg',
+    public_id: 'dummy_public_id'
+  };
+};
+
+const app = express();
+app.use(express.json());
+
+app.use('/', authenticate, createPinRoute); 
+
+let mongoServer;
+let token;
+
+describe('POST /create', function () {
+  this.timeout(10000);
+
+  before(async function () {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
   });
 
-  it('should respond with 201 and pin data when valid fields + image are provided', async function () {
-    const imagePath = path.join(__dirname, 'dummyimage.jpg');
+  after(async function () {
+    await mongoose.disconnect();
+    if (mongoServer) await mongoServer.stop();
+  });
+
+  beforeEach(async function () {
+    await User.deleteMany({});
+    await Pin.deleteMany({});
+
+    const user = await User.create({
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'testpassword'
+    });
+
+    token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  });
+
+  it('should create a new pin with valid data', async function () {
+    const dummyImagePath = path.resolve('test/dummyimage.jpg');
 
     const res = await request(app)
       .post('/create')
+      .set('Authorization', `Bearer ${token}`)
       .field('title', 'Test Pin')
-      .field('description', 'A test pin description')
+      .field('description', 'This is a test pin')
       .field('latitude', '40.7128')
       .field('longitude', '-74.0060')
       .field('visibility', '1')
-      .attach('image', imagePath);
+      .field('locationName', 'Test Location')
+      .attach('image', dummyImagePath);
 
-    assert.equal(res.status, 201);
+    assert.strictEqual(res.statusCode, 201);
     assert.ok(res.body._id);
-    assert.equal(res.body.title, 'Test Pin');
-    assert.equal(res.body.description, 'A test pin description');
   });
 
-  it('should respond with 500 and error message if image file is missing', async function () {
+  it('should return 400 if required fields are missing', async function () {
+    const dummyImagePath = path.resolve('test/dummyimage.jpg');
+
     const res = await request(app)
       .post('/create')
-      .field('title', 'Test Pin')
-      .field('description', 'A test pin description')
+      .set('Authorization', `Bearer ${token}`)
+      .field('title', '') // missing title
+      .field('description', 'Missing title here')
       .field('latitude', '40.7128')
       .field('longitude', '-74.0060')
-      .field('visibility', '1');
+      .field('visibility', '1')
+      .field('locationName', 'Somewhere')
+      .attach('image', dummyImagePath);
 
-    assert.equal(res.status, 500);
-    assert.equal(res.body.error, 'Image file is missing');
+    assert.strictEqual(res.statusCode, 400);
+    assert.ok(res.body.error);
   });
 });

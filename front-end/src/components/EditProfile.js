@@ -120,15 +120,27 @@ const EditProfile = ({ setCurrComponent, user, setUser }) => {
           className="w-full p-2 border rounded"
         />
       </div>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={() => setCurrComponent(
+            <ProfileNav
+              setCurrComponent={setCurrComponent}
+              setUser={setUser}
+              user={user}
+            />
+          )}
+          className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400 transition"
+        >
+          Back
+        </button>
         <button
           onClick={handleSave}
           disabled={!username || isLoading}
-          className={`px-4 py-2 text-white transition ${
+          className={`px-4 py-2 text-white transition w-24 text-center ${
             username && !isLoading ? "bg-gray-500 hover:bg-green-600" : "bg-gray-300 cursor-not-allowed"
           }`}
         >
-          {isLoading ? "Saving..." : "Save and Back"}
+          {isLoading ? "Saving..." : "Save"}
         </button>
       </div>
     </div>
