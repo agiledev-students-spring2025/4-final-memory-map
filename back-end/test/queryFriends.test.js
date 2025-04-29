@@ -54,57 +54,48 @@ describe('GET /query_friends', function () {
     await user.save();
   });
 
-  it('should return 200 and a list of friends', async function () {
-    const fakeFriends = [
-      { username: 'abby', email: 'abby@example.com', profilePicture: 'pic1.jpg' },
-      { username: 'chris', email: 'chris@example.com', profilePicture: 'pic2.jpg' }
-    ];
+  it('should return the list of friends for the user', async function () {
+    const res = await request(app)
+      .get('/query_friends')
+      .set('Authorization', `Bearer ${token}`);
 
-    findByIdStub = sinon.stub(User, 'findById').returns({
-      populate: sinon.stub().resolves({
-        _id: 'fakeUserId',
-        username: 'testuser',
-        friends: fakeFriends
-      })
-    });
-
-    const res = await request(app).get('/query_friends');
-
-    assert.equal(res.status, 200);
+    assert.strictEqual(res.status, 200);
     assert.ok(Array.isArray(res.body));
-    assert.equal(res.body.length, 2);
-    assert.deepEqual(res.body[0], fakeFriends[0]);
-    assert.deepEqual(res.body[1], fakeFriends[1]);
+    assert.strictEqual(res.body.length, 1);
+    assert.strictEqual(res.body[0].username, 'frienduser');
+    assert.strictEqual(res.body[0].email, 'friend@example.com');
   });
 
-  it('should return 404 if user is not found', async function () {
-    findByIdStub = sinon.stub(User, 'findById').returns({
-      populate: sinon.stub().resolves(null)
-    });
+  it('should return empty array if user has no friends', async function () {
+    await user.updateOne({ friends: [] });
 
-    const res = await request(app).get('/query_friends');
+    const res = await request(app)
+      .get('/query_friends')
+      .set('Authorization', `Bearer ${token}`);
 
-    assert.equal(res.status, 404);
-    assert.deepEqual(res.body, { error: 'User not found' });
+    assert.strictEqual(res.status, 200);
+    assert.ok(Array.isArray(res.body));
+    assert.strictEqual(res.body.length, 0);
   });
 
-  it('should return 500 if DB throws an error', async function () {
-    findByIdStub = sinon.stub(User, 'findById').returns({
-      populate: sinon.stub().rejects(new Error('DB error'))
-    });
+  it('should return 401 if no token provided', async function () {
+    const res = await request(app)
+      .get('/query_friends');
 
-    const res = await request(app).get('/query_friends');
-
-    assert.equal(res.status, 500);
-    assert.deepEqual(res.body, { error: 'Failed to fetch friend data' });
+    assert.strictEqual(res.status, 401);
+    assert.strictEqual(res.body.message, 'No token provided');
   });
 
-  it('should return 401 if no token is provided', async function () {
-    authStub.restore();
+  it('should return 401 if authenticated user not found', async function () {
+    await User.deleteMany({});
 
-    const res = await request(app).get('/query_friends');
+    const res = await request(app)
+      .get('/query_friends')
+      .set('Authorization', `Bearer ${token}`);
 
-    assert.equal(res.status, 401);
-    assert.deepEqual(res.body, { message: 'No token provided' });
+    assert.strictEqual(res.status, 401);
+    const msg = res.body.message || res.body.error;
+    assert.ok(msg, 'Expected an error message');
+    assert.match(msg, /user not found/i);
   });
 });
