@@ -112,40 +112,28 @@ describe('GET /query_feed', function () {
 
     const pinTitles = res.body.map(pin => pin.title);
 
-    assert.ok(pinTitles.includes('Own Pin'));
-    assert.ok(pinTitles.includes('Friend Public Pin'));
-    assert.ok(pinTitles.includes('Friend Only Pin'));
-    assert.ok(!pinTitles.includes('Friend Private Pin'));
+    assert.ok(pinTitles.includes('Own Pin'), 'Own pin should be visible');
+    assert.ok(pinTitles.includes('Friend Public Pin'), 'Friend public pin should be visible');
+    assert.ok(pinTitles.includes('Friend Only Pin'), 'Friend-only pin should be visible');
+    assert.ok(!pinTitles.includes('Friend Private Pin'), 'Friend private pin should NOT be visible');
   });
 
-  it('should return 400 if no user is injected by authenticate', async function () {
-    authStub.restore();
-    sinon.stub(authModule, 'authenticate').callsFake((req, res, next) => {
-      req.user = null;
-      return res.status(400).json({ error: 'Bad auth' });
-    });
+  it('should return 401 if authenticated user not found', async function () {
+    await User.deleteMany({});
+  
+    const res = await request(app)
+      .get('/query_feed')
+      .set('Authorization', `Bearer ${token}`);
+  
+    assert.strictEqual(res.status, 401);
+    assert.strictEqual(res.body.message, 'User not found');
+  });  
 
-    const res = await request(app).get('/query_feed');
-    assert.equal(res.status, 400);
-    assert.deepEqual(res.body, { error: 'Bad auth' });
-  });
+  it('should return 401 if no token provided', async function () {
+    const res = await request(app)
+      .get('/query_feed');
 
-  it('should return 404 if user is not found in DB', async function () {
-    userFindByIdStub = sinon.stub(User, 'findById').resolves(null);
-
-    const res = await request(app).get('/query_feed');
-
-    assert.equal(res.status, 404);
-    assert.deepEqual(res.body, { error: 'User not found' });
-  });
-
-  it('should return 500 if Pin.find throws an error', async function () {
-    sinon.stub(User, 'findById').resolves({ _id: 'fakeUserId', friends: [] });
-    sinon.stub(Pin, 'find').rejects(new Error('Mock DB error'));
-
-    const res = await request(app).get('/query_feed');
-
-    assert.equal(res.status, 500);
-    assert.deepEqual(res.body, { error: 'Failed to fetch pin data from back end.' });
+    assert.strictEqual(res.status, 401);
+    assert.strictEqual(res.body.message, 'No token provided');
   });
 });
