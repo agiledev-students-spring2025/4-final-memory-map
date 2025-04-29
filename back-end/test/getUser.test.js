@@ -1,55 +1,53 @@
-import express from 'express';
+import mongoose from 'mongoose';
 import request from 'supertest';
-import sinon from 'sinon';
-import { strict as assert } from 'assert';
-import route from '../routes/user/getUser.js';
+import express from 'express';
+import assert from 'assert';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import jwt from 'jsonwebtoken';
+
 import User from '../models/User.js';
-import * as authModule from '../routes/auth.js';
+import getUserRoute from '../routes/user/getUser.js';
+import { authenticate } from '../routes/auth.js';
+
+const app = express();
+app.use(express.json());
+
+app.use('/', authenticate, getUserRoute);
+
+let mongoServer;
+let token;
+let user;
 
 describe('GET /get_user', function () {
-  let app;
-  let findByIdStub;
-  let authStub;
+  this.timeout(10000);
 
-  beforeEach(function () {
-    app = express();
-    app.use(express.json());
-
-    authStub = sinon.stub(authModule, 'authenticate').callsFake((req, res, next) => {
-      req.user = { _id: 'fakeUserId' };
-      next();
-    });
-
-    app.use('/', route);
+  before(async function () {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
   });
 
-  afterEach(function () {
-    if (findByIdStub) findByIdStub.restore();
-    if (authStub) authStub.restore();
-  });
+  beforeEach(async function () {
+    await User.deleteMany({});
 
-  it('should return 200 and user data when user exists', async function () {
-    const fakeUser = {
-      _id: '1',
+    user = await User.create({
       username: 'testuser',
       email: 'test@example.com',
-      profilePicture: 'https://example.com/profilePic.jpg',
-      friends: ['friend1', 'friend2']
-    };
+      password: 'Test@password123'
+    });
 
-    findByIdStub = sinon.stub(User, 'findById').resolves(fakeUser);
+    token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  });
 
+  it('should return current authenticated user data', async function () {
     const res = await request(app)
       .get('/get_user')
+      .set('Authorization', `Bearer ${token}`);
 
-    assert.equal(res.status, 200);
-    assert.deepEqual(res.body, {
-      _id: fakeUser._id,
-      username: fakeUser.username,
-      email: fakeUser.email,
-      profilePicture: fakeUser.profilePicture,
-      friends: fakeUser.friends
-    });
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.username, 'testuser');
+    assert.strictEqual(res.body.email, 'test@example.com');
+    assert.ok(res.body.profilePicture);
   });
 
   it('should return 404 if user is not found', async function () {
