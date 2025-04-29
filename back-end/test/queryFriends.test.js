@@ -35,6 +35,23 @@ describe('GET /query_friends', function () {
 
   beforeEach(async function () {
     await User.deleteMany({});
+
+    user = await User.create({
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'Test@password123'
+    });
+
+    token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    friend = await User.create({
+      username: 'frienduser',
+      email: 'friend@example.com',
+      password: 'Friend@password123'
+    });
+
+    user.friends.push(friend._id);
+    await user.save();
   });
 
   it('should return 200 and a list of friends', async function () {
