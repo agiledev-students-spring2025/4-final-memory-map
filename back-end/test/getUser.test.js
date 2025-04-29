@@ -50,13 +50,23 @@ describe('GET /get_user', function () {
     assert.ok(res.body.profilePicture);
   });
 
-  it('should return 404 if user is not found', async function () {
-    findByIdStub = sinon.stub(User, 'findById').resolves(null);
+  it('should return 401 if authenticated user not found', async function () {
+    await User.deleteMany({});
 
-    const res = await request(app).get('/get_user');
+    const res = await request(app)
+      .get('/get_user')
+      .set('Authorization', `Bearer ${token}`);
 
-    assert.equal(res.status, 404);
-    assert.deepEqual(res.body, { error: 'User not found' });
+    assert.strictEqual(res.status, 401);
+    assert.strictEqual(res.body.message, 'User not found');
+  });
+
+  it('should return 401 if no token is provided', async function () {
+    const res = await request(app)
+      .get('/get_user');
+
+    assert.strictEqual(res.status, 401);
+    assert.strictEqual(res.body.message, 'No token provided');
   });
 
   it('should return 500 if findById throws an error', async function () {
