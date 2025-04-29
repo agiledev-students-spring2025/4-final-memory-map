@@ -1,11 +1,24 @@
-import express from 'express';
+import mongoose from 'mongoose';
 import request from 'supertest';
-import sinon from 'sinon';
-import { strict as assert } from 'assert';
-import route from '../routes/pin/queryFeed.js';
-import * as authModule from '../routes/auth.js';
+import express from 'express';
+import assert from 'assert';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import jwt from 'jsonwebtoken';
+
 import User from '../models/User.js';
 import Pin from '../models/Pin.js';
+import queryFeedRoute from '../routes/pin/queryFeed.js';
+import { authenticate } from '../routes/auth.js';
+
+const app = express();
+app.use(express.json());
+
+app.use('/', authenticate, queryFeedRoute);
+
+let mongoServer;
+let token;
+let user;
+let friend;
 
 describe('GET /query_feed', function () {
   let app;
