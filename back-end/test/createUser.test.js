@@ -1,8 +1,38 @@
-import request from 'supertest';  
-import { strict as assert } from 'assert';
-import app from '../app.js';  
+import mongoose from 'mongoose';
+import request from 'supertest';
+import express from 'express';
+import assert from 'assert';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+
+import User from '../models/User.js';
+import createUserRoute from '../routes/user/createUser.js';
+import { authenticate } from '../routes/auth.js';
+
+const app = express();
+app.use(express.json());
+
+app.use('/', createUserRoute);
+
+let mongoServer;
 
 describe('POST /create_user', () => {
+  this.timeout(10000);
+
+  before(async function () {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
+  });
+
+  after(async function () {
+    await mongoose.disconnect();
+    if (mongoServer) await mongoServer.stop();
+  });
+
+  beforeEach(async function () {
+    await User.deleteMany({});
+  });
+  
   it('should create a user with valid data', async () => {
     const newUser = {
       user_id: '1',
