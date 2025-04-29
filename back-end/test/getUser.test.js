@@ -68,13 +68,54 @@ describe('GET /get_user', function () {
     assert.strictEqual(res.status, 401);
     assert.strictEqual(res.body.message, 'No token provided');
   });
+});
 
-  it('should return 500 if findById throws an error', async function () {
-    findByIdStub = sinon.stub(User, 'findById').rejects(new Error('Database error'));
+describe('GET /get_user/:userId', function () {
+  this.timeout(10000);
 
-    const res = await request(app).get('/get_user');
+  beforeEach(async function () {
+    await User.deleteMany({});
 
-    assert.equal(res.status, 500);
-    assert.deepEqual(res.body, { error: 'Failed to fetch user data' });
+    user = await User.create({
+      username: 'otheruser',
+      email: 'other@example.com',
+      password: 'Other@password123'
+    });
+
+    token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
   });
+
+  it('should return user data by userId', async function () {
+    const res = await request(app)
+      .get(`/get_user/${user._id}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.username, 'otheruser');
+    assert.ok(res.body.profilePicture);
+  });
+
+  it('should return 400 for invalid userId format', async function () {
+    const res = await request(app)
+      .get('/get_user/invalid-id')
+      .set('Authorization', `Bearer ${token}`);
+
+    assert.strictEqual(res.status, 400);
+    assert.strictEqual(res.body.error, 'Invalid user ID format');
+  });
+
+  it('should return 404 if userId does not exist', async function () {
+    const fakeId = new mongoose.Types.ObjectId();
+    const res = await request(app)
+      .get(`/get_user/${fakeId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    assert.strictEqual(res.status, 404);
+    assert.strictEqual(res.body.error, 'User not found');
+  });
+});
+
+after(async function () {
+  await mongoose.disconnect();
+  if (mongoServer) await mongoServer.stop();
 });
