@@ -46,8 +46,8 @@ Run these commands to test the backend
 
 ````
 cd back-end
-npm install
-npm test
+npm install jsonwebtoken mongoose supertest express mongodb-memory-server cloudinary
+JWT_SECRET=testsecret npx mocha test/**/*.test.js
 ````
 
 ## Other Links, Sprints, and Due Dates

@@ -16,4 +16,4 @@ For testing
 
 - cd back-end
 - npm install jsonwebtoken mongoose supertest express mongodb-memory-server cloudinary
-- JWT_SECRET=testsecret npx mocha "test/**/*.test.js"
+- JWT_SECRET=testsecret npx mocha test/**/*.test.js
