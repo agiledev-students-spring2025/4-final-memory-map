@@ -1,29 +1,40 @@
-import express from 'express';
+import mongoose from 'mongoose';
 import request from 'supertest';
-import sinon from 'sinon';
-import { strict as assert } from 'assert';
-import route from '../routes/friend/queryFriends.js';
+import express from 'express';
+import assert from 'assert';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import jwt from 'jsonwebtoken';
+
 import User from '../models/User.js';
-import * as authModule from '../routes/auth.js';
+import queryFriendsRoute from '../routes/friend/queryFriends.js';
+import { authenticate } from '../routes/auth.js';
 
-describe('GET /query_friends (unit test)', function () {
-  let app;
-  let authStub;
+const app = express();
+app.use(express.json());
 
-  beforeEach(function () {
-    app = express();
-    app.use(express.json());
+app.use('/', authenticate, queryFriendsRoute);
 
-    authStub = sinon.stub(authModule, 'authenticate').callsFake((req, res, next) => {
-      req.user = { _id: 'fakeUserId' };
-      next();
-    });
+let mongoServer;
+let token;
+let user;
+let friend;
 
-    app.use('/', route);
+describe('GET /query_friends', function () {
+  this.timeout(10000);
+
+  before(async function () {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
   });
 
-  afterEach(function () {
-    sinon.restore();
+  after(async function () {
+    await mongoose.disconnect();
+    if (mongoServer) await mongoServer.stop();
+  });
+
+  beforeEach(async function () {
+    await User.deleteMany({});
   });
 
   it('should return 200 and a list of friends', async function () {
