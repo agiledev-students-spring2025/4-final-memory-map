@@ -33,28 +33,23 @@ describe('POST /create_user', () => {
     await User.deleteMany({});
   });
   
-  it('should create a user with valid data', async () => {
-    const newUser = {
-      user_id: '1',
-      username: 'john_doe',
-      first_name: 'John',
-      last_name: 'Doe',
-      email: 'john.doe@example.com',
-      gender: 'male',
-      password: 'securepassword123',
-    };
-
+  it('should register a new user with valid data', async function () {
     const res = await request(app)
-      .post('/create_user')
-      .send(newUser);
+      .post('/register')
+      .send({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'Test@password123',
+        confirmPassword: 'Test@password123'
+      });
 
-    assert.equal(res.status, 201);
-    assert.equal(res.body.message, 'User created');
+
+    assert.strictEqual(res.status, 201);
+    assert.strictEqual(res.body.message, 'Registration successful');
+    assert.ok(res.body.token);
     assert.ok(res.body.user);
-    assert.equal(res.body.user.user_id, newUser.user_id);
-    assert.equal(res.body.user.username, newUser.username);
-    assert.equal(res.body.user.email, newUser.email);
-    assert.ok(res.body.user.profile_picture);
+    assert.strictEqual(res.body.user.username, 'testuser');
+    assert.strictEqual(res.body.user.email, 'test@example.com');
   });
 
   it('should return 400 if required fields are missing', async () => {
