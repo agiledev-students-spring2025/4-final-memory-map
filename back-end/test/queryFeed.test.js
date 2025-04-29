@@ -103,48 +103,19 @@ describe('GET /query_feed', function () {
     });
   });
 
-  it('should return 200 and an array of filtered pins', async function () {
-    const fakeUser = {
-      _id: '1',
-      friends: ['friendId1', 'friendId2']
-    };
+  it('should return transformed pins visible to user', async function () {
+    const res = await request(app)
+      .get('/query_feed')
+      .set('Authorization', `Bearer ${token}`);
 
-    const fakePins = [
-      {
-        _id: 'pin1',
-        title: 'Public Pin',
-        description: 'This is public',
-        location: { coordinates: [-74.0060, 40.7128] },
-        locationName: 'NYC',
-        imageUrl: 'http://image.jpg',
-        author: 'anotherUser',
-        tags: [],
-        visibility: '1',
-        createdAt: new Date()
-      },
-      {
-        _id: 'pin2',
-        title: 'Private Pin',
-        description: 'Should not appear',
-        location: { coordinates: [-74.0060, 40.7128] },
-        locationName: 'Hidden Place',
-        imageUrl: 'http://image2.jpg',
-        author: 'randomUser',
-        tags: [],
-        visibility: '3',
-        createdAt: new Date()
-      }
-    ];
+    assert.strictEqual(res.status, 200);
 
-    userFindByIdStub = sinon.stub(User, 'findById').resolves(fakeUser);
-    pinFindStub = sinon.stub(Pin, 'find').resolves(fakePins);
+    const pinTitles = res.body.map(pin => pin.title);
 
-    const res = await request(app).get('/query_feed');
-
-    assert.equal(res.status, 200);
-    assert.ok(Array.isArray(res.body));
-    assert.equal(res.body.length, 1); 
-    assert.equal(res.body[0].title, 'Public Pin');
+    assert.ok(pinTitles.includes('Own Pin'));
+    assert.ok(pinTitles.includes('Friend Public Pin'));
+    assert.ok(pinTitles.includes('Friend Only Pin'));
+    assert.ok(!pinTitles.includes('Friend Private Pin'));
   });
 
   it('should return 400 if no user is injected by authenticate', async function () {
