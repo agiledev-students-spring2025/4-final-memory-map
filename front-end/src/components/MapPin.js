@@ -129,26 +129,6 @@ const MapPin = ({ pinData, onDelete }) => {
   const handleUpdatePin = () => {
     console.log(pinData);
     navigate('/update-location', { state: pinData });
-    // setIsUpdating(true);
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   await axios.post(`${process.env.REACT_APP_API_URL}/update`, {
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`
-    //     },
-    //     data: { }
-    //   });
-
-    //   if (onUpdate) {
-    //     onUpdate(id);
-    //   }
-    // } catch (error) {
-    //   console.error('Error updating pin:', error);
-    //   alert('Failed to update pin. Please try again.');
-    // } finally {
-    //   setIsUpdating(false);
-    //   setShowUpdateConfirm(false);
-    // }
   }
 
   const formatDate = (date) => {
