@@ -36,7 +36,7 @@ const visibilityMap = {
   '3': 'Public'
 };
 
-const MapPin = ({ pinData, onDelete, onUpdate }) => {
+const MapPin = ({ pinData, onDelete }) => {
   const { 
     id,
     latitude, 
@@ -127,7 +127,8 @@ const MapPin = ({ pinData, onDelete, onUpdate }) => {
   };
 
   const handleUpdatePin = () => {
-    navigate('/update-location');
+    console.log(pinData);
+    navigate('/update-location', { state: pinData });
     // setIsUpdating(true);
     // try {
     //   const token = localStorage.getItem('token');
