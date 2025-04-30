@@ -16,7 +16,7 @@ const Settings = ({ setCurrComponent, setUser, user }) => {
             <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">Settings</h2>
             
             <div className="space-y-6">
-                {/* Help Section */}
+
                 <div className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="text-lg font-semibold mb-4 text-gray-700">Support</h3>
                     <button 
@@ -30,7 +30,7 @@ const Settings = ({ setCurrComponent, setUser, user }) => {
                     </button>
                 </div>
 
-                {/* About Section */}
+              
                 <div className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="text-lg font-semibold mb-4 text-gray-700">About</h3>
                     <div className="space-y-2">
