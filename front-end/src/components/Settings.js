@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import ProfileNav from "./ProfileNav";
 import Help from "./Help";
 
 const Settings = ({ setCurrComponent, setUser, user }) => {
-    const [notifications, setNotifications] = useState(true);
-    const [darkMode, setDarkMode] = useState(false);
-    const [language, setLanguage] = useState("English");
-
     const handleSave = () => {
         if (!setUser) {
             console.error("Unable to save settings");
@@ -20,54 +16,7 @@ const Settings = ({ setCurrComponent, setUser, user }) => {
             <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">Settings</h2>
             
             <div className="space-y-6">
-                {/* Notifications Section */}
-                <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-700">Notifications</h3>
-                    <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Enable Notifications</span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="sr-only peer"
-                                checked={notifications}
-                                onChange={() => setNotifications(!notifications)}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                    </div>
-                </div>
-
-                {/* Appearance Section */}
-                <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-700">Appearance</h3>
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="text-gray-600">Dark Mode</span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="sr-only peer"
-                                checked={darkMode}
-                                onChange={() => setDarkMode(!darkMode)}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Language</span>
-                        <select
-                            value={language}
-                            onChange={(e) => setLanguage(e.target.value)}
-                            className="bg-white border border-gray-300 rounded-md px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="English">English</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="French">French</option>
-                            <option value="German">German</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Help & About Section */}
+                {/* Help Section */}
                 <div className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="text-lg font-semibold mb-4 text-gray-700">Support</h3>
                     <button 
@@ -79,25 +28,24 @@ const Settings = ({ setCurrComponent, setUser, user }) => {
                         </svg>
                         Help Center
                     </button>
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                        <span className="text-gray-600">About</span>
-                        <p className="text-sm text-gray-500 mt-1">Version: 0.1.0</p>
+                </div>
+
+                {/* About Section */}
+                <div className="bg-gray-50 p-6 rounded-lg">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-700">About</h3>
+                    <div className="space-y-2">
+                        <p className="text-gray-600">Version: 0.1.0</p>
+                        <p className="text-sm text-gray-500">Memory Map - A place to store and organize your memories</p>
                     </div>
                 </div>
             </div>
 
-            <div className="flex justify-center mt-8 space-x-4">
+            <div className="flex justify-center mt-8">
                 <button 
                     onClick={handleSave}
                     className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                    Save Changes
-                </button>
-                <button 
-                    onClick={() => setCurrComponent(<ProfileNav setCurrComponent={setCurrComponent} setUser={setUser} user={user} />)}
-                    className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                >
-                    Cancel
+                    Back to Profile
                 </button>
             </div>
         </div>
