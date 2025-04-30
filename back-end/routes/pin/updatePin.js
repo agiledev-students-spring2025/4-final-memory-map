@@ -7,6 +7,7 @@ import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 import path from 'path';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -78,8 +79,7 @@ router.put('/update_pin', authenticate, upload.single('image'), validatePin, asy
               validFriendIds.push(friendId);
           }
       }
-      
-      parsedTags = validFriendIds;
+      currentPin.tags = validFriendIds;
   }
 
     if (description) currentPin.description = description;
