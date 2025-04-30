@@ -1,8 +1,23 @@
 # Memory Map Project
 
+## GitHub Actions Status
+
+[![Test](https://img.shields.io/github/actions/workflow/status/agiledev-students-spring2025/4-final-memory-map/deploy.yml?branch=master&label=Test&job=test)](https://github.com/agiledev-students-spring2025/4-final-memory-map/actions/workflows/deploy.yml)
+
+[![Deploy](https://img.shields.io/github/actions/workflow/status/agiledev-students-spring2025/4-final-memory-map/deploy.yml?branch=master&label=Deploy&job=deploy)](https://github.com/agiledev-students-spring2025/4-final-memory-map/actions/workflows/deploy.yml)
+
+
+## Project Website
+[memorymap.club](memorymap.club)
+
+## Extra Credit
+
+- Deployed to Docker Container on Digital Ocean in ```docker-compose.yml```
+- CI and CD both set up via Github Action inside ```.github/workflows/deploy.yml```
+
 ## Project Description
 
-Create a web application that allows users to map their favorite memories by pinning locations with images, captions, and audio messages. Users can follow their friends to see their favorite memory locations.
+Create a web application that allows users to map their favorite memories by pinning locations with images, caption. Users can follow their friends to see their favorite memory locations.
 
 ## Project Vision Statement
 
@@ -24,7 +39,11 @@ As a team, we have collaborated to create a wireframe to give a general idea of 
 
 To work on this project, please follow our [contributing guidelines](./instructions-4-deployment.md).<br/>
 
-Make a copy of the .envCOPY file and name it .env then copy the .env data from discord
+Make a copy of the .envCOPY file and name it .env then copy the .env data from discord for the backend
+Make a copy of .env.production.local.copy and name it .env.production.local in the frontend to make it work locally
+For production use .env.production.local.copy with the correct server IP, and use docker compose up
+
+#### Everything is ran on Ubuntu, please either use WSL or Ubuntu to run this
 
 Run these commands to build the frontend
 
@@ -46,8 +65,20 @@ Run these commands to test the backend
 
 ````
 cd back-end
-npm install jsonwebtoken mongoose supertest express mongodb-memory-server cloudinary
-JWT_SECRET=testsecret npx mocha test/**/*.test.js
+JWT_SECRET=testsecret 
+npx mocha test/**/*.test.js
+````
+
+Run these commands to spin up docker containers for the backend and front end
+Install and open Docker Desktop then run
+````
+docker compose up
+````
+Or on command prompt either on Ubuntu or WSL
+````
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl start docker
+docker compose up
 ````
 
 ## Other Links, Sprints, and Due Dates
