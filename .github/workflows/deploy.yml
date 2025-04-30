@@ -5,6 +5,27 @@ on:
     branches: [master]
 
 jobs:
+  test:
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: ./back-end
+
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+
+      - name: Install backend dependencies
+        run: npm install
+
+      - name: Run backend tests
+        run: JWT_SECRET=testsecret npx mocha test/**/*.test.js
+        
   deploy:
     runs-on: ubuntu-latest
 
