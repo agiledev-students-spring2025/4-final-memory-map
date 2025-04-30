@@ -317,6 +317,43 @@ const UpdateLocation = () => {
                         <option value={VISIBILITY.PUBLIC}>{VISIBILITY_LABELS[VISIBILITY.PUBLIC]}</option>
                     </select>
                 </div>
+
+                <div>
+                    <button
+                        type="button"
+                        onClick={() => setShowTagFriendsPopup(true)}
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                        </svg>
+                        Tag Friends {selectedFriends.length > 0 && `(${selectedFriends.length})`}
+                    </button>
+                    
+                    {selectedFriends.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                            {selectedFriends.map(friendId => {
+                                const friend = friends.find(f => f._id === friendId);
+                                if (!friend) return null;
+                                
+                                return (
+                                    <span key={friendId} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                        {friend.username}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleFriendSelect(friendId)}
+                                            className="ml-1 text-indigo-500 hover:text-indigo-700 focus:outline-none"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
                 
                 {error && (
                     <div className="p-2 text-sm text-red-600 bg-red-50 rounded">
